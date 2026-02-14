@@ -1,16 +1,13 @@
-import { body, param } from 'express-validator';
-import { checkValidators } from '../../middlewares/check.validators.js';
+'use strict';
 
-export const validateCreateBranch = [
-    body('branchId').isNumeric().withMessage('ID de sucursal debe ser numérico'),
-    body('nombre').notEmpty().trim().withMessage('El nombre es requerido'),
-    body('zona').isInt({ min: 1, max: 25 }).withMessage('Zona inválida'),
-    body('telefono').isNumeric().isLength({ min: 8, max: 8 }).withMessage('Teléfono debe tener 8 dígitos'),
-    body('tieneAutoservicio').isBoolean().withMessage('Especifique si tiene autoservicio'),
-    checkValidators
-];
+import { Router } from 'express';
+import { getBranches, createBranch, updateBranch } from '../Branch/branch.controller.js';
+import { validateCreateBranch, validateUpdateBranch } from '../../middlewares/branch.validator.js';
 
-export const validateUpdateBranch = [
-    param('id').isMongoId().withMessage('ID de registro inválido'),
-    checkValidators
-];
+const router = Router();
+
+router.get('/', getBranches);
+router.post('/', validateCreateBranch, createBranch);
+router.put('/:id', validateUpdateBranch, updateBranch);
+
+export default router;

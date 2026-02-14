@@ -16,6 +16,7 @@ const BASE_URL = '/restaurantSystem/v1';
 //import employeeRoutes from '../src/Employee/employee.routes.js';
 //import productRoutes from '../src/Product/product.routes.js';
 //import orderRoutes from '../src/Order/order.routes.js';
+//import branchRoutes from '../src/Branch/branch.routes.js';
 
 const middleware = (app) => {
     app.use(helmet(helmetConfiguration)); // Configuramos Helmet
@@ -36,6 +37,7 @@ const routes = (app) => {
     //app.use(`${BASE_URL}/employee`, employeeRoutes);
     //app.use(`${BASE_URL}/product`, productRoutes);
     //app.use(`${BASE_URL}/order`, orderRoutes);
+    //app.use(`${BASE_URL}/branch`, branchRoutes);
 }
 
 
