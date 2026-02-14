@@ -12,6 +12,7 @@ import { requestLimit } from '../middlewares/request-limit.js';
 import { errorHandler } from '../middlewares/handle-errors.js';
 import inventoryRoutes from '../src/Inventory/inventory.routes.js';
 import menuRoutes from '../src/Menú/menu.routes.js';
+import tableRoutes from '../src/Table/table.routes.js';
 // Importaciones de Rutas
 const BASE_URL = '/restaurantSystem/v1';
 
@@ -29,6 +30,8 @@ const routes = (app) => {
     app.use(`${BASE_URL}/inventory`, inventoryRoutes);
     // Registro de la ruta base para menú
     app.use(`${BASE_URL}/menu`, menuRoutes);
+    // Registro de la ruta base para mesas
+    app.use(`${BASE_URL}/table`, tableRoutes);
     
     // Health check
     app.get(`${BASE_URL}/health`, (req, res) => {
