@@ -14,6 +14,8 @@ import inventoryRoutes from '../src/Inventory/inventory.routes.js';
 import menuRoutes from '../src/Menú/menu.routes.js';
 import tableRoutes from '../src/Table/table.routes.js';
 import reservationRoutes from '../src/Reservation/reservation.routes.js';
+import saleRoutes from '../src/Sale/sale.routes.js';
+
 // Importaciones de Rutas
 const BASE_URL = '/restaurantSystem/v1';
 
@@ -35,6 +37,8 @@ const routes = (app) => {
     app.use(`${BASE_URL}/table`, tableRoutes);
     // Registro de la ruta base para reservas
     app.use(`${BASE_URL}/reservation`, reservationRoutes);
+    // Registro de la ruta base para ventas
+    app.use(`${BASE_URL}/sale`, saleRoutes);
     
     
     // Health check
