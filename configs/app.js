@@ -15,6 +15,7 @@ import { errorHandler } from '../middlewares/handle-errors.js';
 const BASE_URL = '/restaurantSystem/v1';
 //import employeeRoutes from '../src/Employee/employee.routes.js';
 //import productRoutes from '../src/Product/product.routes.js';
+//import orderRoutes from '../src/Order/order.routes.js';
 
 const middleware = (app) => {
     app.use(helmet(helmetConfiguration)); // Configuramos Helmet
@@ -34,6 +35,7 @@ const middleware = (app) => {
 const routes = (app) => {
     //app.use(`${BASE_URL}/employee`, employeeRoutes);
     //app.use(`${BASE_URL}/product`, productRoutes);
+    //app.use(`${BASE_URL}/order`, orderRoutes);
 }
 
 
