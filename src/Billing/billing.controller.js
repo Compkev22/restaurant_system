@@ -65,6 +65,10 @@ export const createBilling = async (req, res) => {
     try {
         const billingData = req.body;
 
+        if (billingData.BillDate || typeof billingData.BillDate === "object") {
+            billingData.BillDate = new Date();
+        } // Esto es para que si no se envia la fecha, se tome la fecha actual
+
         const billing = new Billing(billingData);
         await billing.save();
 
