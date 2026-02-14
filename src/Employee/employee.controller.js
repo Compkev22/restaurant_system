@@ -1,6 +1,6 @@
 'use strict';
 
-import Employe from './employe.model.js';
+import Employe from './employee.model.js';
 
 export const getEmployees = async (req, res) => {
     try {

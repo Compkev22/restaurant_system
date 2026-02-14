@@ -1,8 +1,8 @@
 'use strict';
 
 import { Router } from 'express';
-import { getEmployees, createEmploye, updateEmploye } from '../Employe/employe.controller.js';
-import { validateCreateEmploye, validateEmployeId } from '../../middlewares/employe-validators.js';
+import { getEmployees, createEmploye, updateEmploye } from '../Employee/employee.controller.js';
+import { validateCreateEmploye, validateEmployeId } from '../../middlewares/employee.validator.js';
 
 const router = Router();
 

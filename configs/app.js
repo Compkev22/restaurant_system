@@ -13,7 +13,7 @@ import { errorHandler } from '../middlewares/handle-errors.js';
 
 // Importaciones de Rutas
 const BASE_URL = '/restaurantSystem/v1';
-
+//import employeeRoutes from '../src/Employee/employee.routes.js';
 
 const middleware = (app) => {
     app.use(helmet(helmetConfiguration)); // Configuramos Helmet
@@ -31,6 +31,7 @@ const middleware = (app) => {
 
 //Integracion de todas las rutas
 const routes = (app) => {
+    //app.use(`${BASE_URL}/employee`, employeeRoutes);
 }
 
 
