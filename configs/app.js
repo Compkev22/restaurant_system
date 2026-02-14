@@ -5,60 +5,49 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
-import { corsOptions } from './cors-configuration.js'; // Agregué el .js, es buena práctica en módulos
+import { corsOptions } from './cors-configuration.js'; 
 import { dbConnection } from './db.js';
 import { helmetConfiguration } from './helmet-configuration.js';
 import { requestLimit } from '../middlewares/request-limit.js';
 import { errorHandler } from '../middlewares/handle-errors.js';
+import inventoryRoutes from '../src/Inventory/inventory.routes.js';
 
 // Importaciones de Rutas
 const BASE_URL = '/restaurantSystem/v1';
 
-
 const middleware = (app) => {
-    app.use(helmet(helmetConfiguration)); // Configuramos Helmet
-    //Importamos los métodos creados anteriormente
+    app.use(helmet(helmetConfiguration));
     app.use(cors(corsOptions));
-    //Limitamos el acceso y el tamaño de las consultas
     app.use(express.urlencoded({ extended: false, limit: '10mb' }));
-    //Las consultas Json tendrán un tamaño máximo de 10mb
     app.use(express.json({ limit: '10mb' }));
-    //Límite de peticiones por IP
     app.use(requestLimit);
-    //Morgan nos ayudará a detectar errores del lado del usuario
     app.use(morgan('dev'));
 }
 
-//Integracion de todas las rutas
 const routes = (app) => {
+    // Registro de la ruta base para inventario
+    app.use(`${BASE_URL}/inventory`, inventoryRoutes);
+    
+    // Health check
+    app.get(`${BASE_URL}/health`, (req, res) => {
+        res.status(200).json({ status: 'ok', service: 'Restaurant_System Admin' });
+    });
 }
-
-
-
 
 const initServer = async () => {
     const app = express();
     const PORT = process.env.PORT || 3001;
 
     try {
-        // 1. Conectar a DB (Usa await para esperar la conexión)
         await dbConnection();
-
-        // 2. Configurar Middlewares
         middleware(app);
-
-        // 3. Configurar Rutas (Incluyendo el health check)
+        
+        // Las rutas deben cargarse ANTES que el manejador de errores
         routes(app);
 
-        // 4. Manejador de errores (debe ir después de las rutas)
+        // El manejador de errores siempre debe ir al final
         app.use(errorHandler);
 
-        // Mueve el app.get del health check AQUÍ (antes del listen)
-        app.get(`${BASE_URL}/health`, (req, res) => {
-            res.status(200).json({ status: 'ok', service: 'Restaurant_System Admin' });
-        });
-
-        // 4. Iniciar escucha
         app.listen(PORT, () => {
             console.log(`Servidor corriendo en el puerto ${PORT}`);
             console.log(`Base URL: http://localhost:${PORT}${BASE_URL}`);
