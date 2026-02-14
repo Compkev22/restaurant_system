@@ -11,7 +11,7 @@ import { helmetConfiguration } from './helmet-configuration.js';
 import { requestLimit } from '../middlewares/request-limit.js';
 import { errorHandler } from '../middlewares/handle-errors.js';
 import inventoryRoutes from '../src/Inventory/inventory.routes.js';
-
+import menuRoutes from '../src/Menú/menu.routes.js';
 // Importaciones de Rutas
 const BASE_URL = '/restaurantSystem/v1';
 
@@ -27,6 +27,8 @@ const middleware = (app) => {
 const routes = (app) => {
     // Registro de la ruta base para inventario
     app.use(`${BASE_URL}/inventory`, inventoryRoutes);
+    // Registro de la ruta base para menú
+    app.use(`${BASE_URL}/menu`, menuRoutes);
     
     // Health check
     app.get(`${BASE_URL}/health`, (req, res) => {
