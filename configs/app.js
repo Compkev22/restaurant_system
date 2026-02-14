@@ -13,6 +13,7 @@ import { errorHandler } from '../middlewares/handle-errors.js';
 import inventoryRoutes from '../src/Inventory/inventory.routes.js';
 import menuRoutes from '../src/Menú/menu.routes.js';
 import tableRoutes from '../src/Table/table.routes.js';
+import reservationRoutes from '../src/Reservation/reservation.routes.js';
 // Importaciones de Rutas
 const BASE_URL = '/restaurantSystem/v1';
 
@@ -32,6 +33,9 @@ const routes = (app) => {
     app.use(`${BASE_URL}/menu`, menuRoutes);
     // Registro de la ruta base para mesas
     app.use(`${BASE_URL}/table`, tableRoutes);
+    // Registro de la ruta base para reservas
+    app.use(`${BASE_URL}/reservation`, reservationRoutes);
+    
     
     // Health check
     app.get(`${BASE_URL}/health`, (req, res) => {
