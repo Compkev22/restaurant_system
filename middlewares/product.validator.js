@@ -21,8 +21,8 @@ export const validateCreateProduct = [
 
     body('imagen_url')
         .optional()
-        .isURL().withMessage('Debe proporcionar una URL válida para la imagen'),
-
+        .isURL().withMessage('URL de imagen no válida'),
+        
     body('estado')
         .optional()
         .isIn(['Disponible', 'Agotado', 'Descontinuado']).withMessage('Estado no válido'),

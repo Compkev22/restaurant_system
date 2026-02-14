@@ -34,8 +34,16 @@ export const getProducts = async (req, res) => {
 
 export const createProduct = async (req, res) => {
     try {
-        const product = new Product(req.body);
+        const data = req.body;
+
+        // Si Cloudinary subió el archivo, asignamos la URL segura al modelo
+        if (req.file) {
+            data.imagen_url = req.file.path;
+        }
+
+        const product = new Product(data);
         await product.save();
+
         res.status(201).json({ success: true, data: product });
     } catch (error) {
         res.status(400).json({ success: false, error: error.message });
@@ -45,7 +53,14 @@ export const createProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
-        const updatedProduct = await Product.findByIdAndUpdate(id, req.body, { new: true });
+        const data = req.body;
+
+        // Si se está enviando una nueva imagen en la actualización
+        if (req.file) {
+            data.imagen_url = req.file.path;
+        }
+
+        const updatedProduct = await Product.findByIdAndUpdate(id, data, { new: true });
         
         if (!updatedProduct) return res.status(404).json({ success: false, message: 'Producto no encontrado' });
         

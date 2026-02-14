@@ -66,8 +66,8 @@ const createCloudinaryUploader = (folder) => {
  
 // ----------------------------------------------------------------------------------------------------------
 // Aqui van los metodos para la actualización de imagenes, se pueden crear mas metodos para otras carpetas
-export const uploadCardImage = createCloudinaryUploader(
-    process.env.CLOUDINARY_FOLDER || 'bank_system/cards'
+export const uploadProductImage = createCloudinaryUploader(
+    process.env.CLOUDINARY_FOLDER || 'restaurantSystem/products'
 );
 // ----------------------------------------------------------------------------------------------------------
 
