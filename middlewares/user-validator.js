@@ -40,7 +40,7 @@ export const validateCreateUser = [
 export const validateUpdateUserRequest = [
     param('id')
         .isMongoId()
-        .withMessage('ID debe ser un ObjectId válido de MongoDB'),
+        .withMessage('ID debe ser un ObjectId'),
 
     body('UserNIT')
         .optional()
@@ -75,13 +75,7 @@ export const validateUpdateUserRequest = [
 export const validateUserStatusChange = [
     param('id')
         .isMongoId()
-        .withMessage('ID debe ser un ObjectId válido de MongoDB'),
-
-    body('UserStatus')
-        .notEmpty()
-        .withMessage('El estado es requerido')
-        .isIn(['ACTIVE', 'INACTIVE'])
-        .withMessage('Estado no válido'),
+        .withMessage('ID debe ser un ObjectId'),
 
     checkValidators,
 ];
@@ -89,7 +83,7 @@ export const validateUserStatusChange = [
 export const validateGetUserById = [
     param('id')
         .isMongoId()
-        .withMessage('ID debe ser un ObjectId válido de MongoDB'),
+        .withMessage('ID debe ser un ObjectId'),
 
     checkValidators,
 ];
