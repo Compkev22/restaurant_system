@@ -10,17 +10,18 @@ import { dbConnection } from './db.js';
 import { helmetConfiguration } from './helmet-configuration.js';
 import { requestLimit } from '../middlewares/request-limit.js';
 import { errorHandler } from '../middlewares/handle-errors.js';
-import inventoryRoutes from '../src/Inventory/inventory.routes.js';
-import menuRoutes from '../src/Menú/menu.routes.js';
-import tableRoutes from '../src/Table/table.routes.js';
-import reservationRoutes from '../src/Reservation/reservation.routes.js';
-import saleRoutes from '../src/Sale/sale.routes.js';
 
 // Importaciones de Rutas
 const BASE_URL = '/restaurantSystem/v1';
 import userRoutes from '../src/User/user.routes.js';
 import combosRoutes from '../src/Combo/combo.routes.js';
 import eventRoutes from '../src/Event/event.routes.js';
+import inventoryRoutes from '../src/Inventory/inventory.routes.js';
+import menuRoutes from '../src/Menú/menu.routes.js';
+import tableRoutes from '../src/Table/table.routes.js';
+import reservationRoutes from '../src/Reservation/reservation.routes.js';
+import saleRoutes from '../src/Sale/sale.routes.js';
+
 
 
 const middleware = (app) => {
@@ -36,6 +37,11 @@ const routes = (app) => {
     app.use(`${BASE_URL}/users`, userRoutes);
     app.use(`${BASE_URL}/combos`, combosRoutes);
     app.use(`${BASE_URL}/events`, eventRoutes);
+    app.use(`${BASE_URL}/inventory`, inventoryRoutes);
+    app.use(`${BASE_URL}/menu`, menuRoutes);
+    app.use(`${BASE_URL}/tables`, tableRoutes);
+    app.use(`${BASE_URL}/reservations`, reservationRoutes);
+    app.use(`${BASE_URL}/sales`, saleRoutes);
 }
 
 
