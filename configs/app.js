@@ -13,6 +13,9 @@ import { errorHandler } from '../middlewares/handle-errors.js';
 
 // Importaciones de Rutas
 const BASE_URL = '/restaurantSystem/v1';
+import userRoutes from '../src/User/user.routes.js';
+import combosRoutes from '../src/Combo/combo.routes.js';
+import eventRoutes from '../src/Event/event.routes.js';
 
 
 const middleware = (app) => {
@@ -31,6 +34,9 @@ const middleware = (app) => {
 
 //Integracion de todas las rutas
 const routes = (app) => {
+    app.use(`${BASE_URL}/users`, userRoutes);
+    app.use(`${BASE_URL}/combos`, combosRoutes);
+    app.use(`${BASE_URL}/events`, eventRoutes);
 }
 
 
