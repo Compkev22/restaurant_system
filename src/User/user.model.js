@@ -24,8 +24,18 @@ const userSchema = new mongoose.Schema({
     UserEmail: {
         type: String,
         required: [true, 'El correo es requerido'],
+        unique: true,
         trim: true,
         lowercase: true,
+    },
+    password: {
+        type: String,
+        required: [true, 'La contraseña es requerida']
+    },
+    role: {
+        type: String,
+        enum: ['ADMIN', 'CLIENT', 'WAITER'],
+        default: 'CLIENT'
     },
     UserStatus: {
         type: String,

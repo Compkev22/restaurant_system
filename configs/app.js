@@ -26,6 +26,7 @@ import productRoutes from '../src/Product/product.routes.js';
 import orderRoutes from '../src/Order/order.routes.js';
 import branchRoutes from '../src/Branch/branch.routes.js';
 import billingRoutes from '../src/Billing/billing.routes.js';
+import authRoutes from '../src/Auth/auth.routes.js';
 
 
 
@@ -53,6 +54,7 @@ const routes = (app) => {
     app.use(`${BASE_URL}/order`, orderRoutes);
     app.use(`${BASE_URL}/branch`, branchRoutes);
     app.use(`${BASE_URL}/billing`, billingRoutes);
+    app.use(`${BASE_URL}/auth`, authRoutes);
 }
 
 
