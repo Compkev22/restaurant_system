@@ -21,6 +21,12 @@ import menuRoutes from '../src/Menú/menu.routes.js';
 import tableRoutes from '../src/Table/table.routes.js';
 import reservationRoutes from '../src/Reservation/reservation.routes.js';
 import saleRoutes from '../src/Sale/sale.routes.js';
+import employeeRoutes from '../src/Employee/employee.routes.js';
+import productRoutes from '../src/Product/product.routes.js';
+import orderRoutes from '../src/Order/order.routes.js';
+import branchRoutes from '../src/Branch/branch.routes.js';
+import billingRoutes from '../src/Billing/billing.routes.js';
+
 
 
 
@@ -42,6 +48,11 @@ const routes = (app) => {
     app.use(`${BASE_URL}/tables`, tableRoutes);
     app.use(`${BASE_URL}/reservations`, reservationRoutes);
     app.use(`${BASE_URL}/sales`, saleRoutes);
+    app.use(`${BASE_URL}/employee`, employeeRoutes);
+    app.use(`${BASE_URL}/product`, productRoutes);
+    app.use(`${BASE_URL}/order`, orderRoutes);
+    app.use(`${BASE_URL}/branch`, branchRoutes);
+    app.use(`${BASE_URL}/billing`, billingRoutes);
 }
 
 
