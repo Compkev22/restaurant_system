@@ -76,15 +76,33 @@ export const updateProduct = async (req, res) => {
         const { id } = req.params;
         const data = req.body;
 
-        // Si se está enviando una nueva imagen en la actualización
+        // valida que los nuevos ID existan en el inventario
+        if (data.ingredientes && Array.isArray(data.ingredientes)) {
+            for (const item of data.ingredientes) {
+                const inventoryExists = await Inventory.findById(item.inventoryId);
+                if (!inventoryExists) {
+                    return res.status(404).json({ 
+                        success: false, 
+                        message: `El ingrediente con ID ${item.inventoryId} no existe` 
+                    });
+                }
+            }
+        }
+
         if (req.file) {
             data.imagen_url = req.file.path;
         }
 
-        const updatedProduct = await Product.findByIdAndUpdate(id, data, { new: true });
-        
-        if (!updatedProduct) return res.status(404).json({ success: false, message: 'Producto no encontrado' });
-        
+        // runValidators asegura que Mongoose valide el arreglo aunque sea una actualización
+        const updatedProduct = await Product.findByIdAndUpdate(id, data, { 
+            new: true, 
+            runValidators: true 
+        }).populate('ingredientes.inventoryId', 'name stock');
+
+        if (!updatedProduct) {
+            return res.status(404).json({ success: false, message: 'Producto no encontrado' });
+        }
+
         res.status(200).json({ success: true, data: updatedProduct });
     } catch (error) {
         res.status(400).json({ success: false, error: error.message });
