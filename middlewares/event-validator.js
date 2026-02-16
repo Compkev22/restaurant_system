@@ -18,17 +18,17 @@ export const validateCreateEvent = [
         .isLength({ max: 100 })
         .withMessage('El número de mesas no puede tener más de 100 caracteres'),
 
-    body('Combo')
-        .notEmpty()
-        .withMessage('El combo es requerido')
-        .isMongoId()
-        .withMessage('El combo debe ser un ObjectId válido'),
-
     body('EventTotal')
         .notEmpty()
         .withMessage('El total es requerido')
         .isNumeric()
         .withMessage('El total debe ser un número válido'),
+
+    body('EventUser')
+        .notEmpty()
+        .withMessage('El usuario es requerido')
+        .isMongoId()
+        .withMessage('El usuario debe ser un ObjectId válido'),
 
     body('EventStatus')
         .optional()

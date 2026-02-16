@@ -41,7 +41,7 @@ export const getEventById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const event = await Event.findById(id).populate('Combo');
+        const event = await Event.findById(id).populate('EventUser');
 
         if (!event) {
             return res.status(404).json({

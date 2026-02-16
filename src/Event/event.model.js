@@ -15,16 +15,16 @@ const eventSchema = new mongoose.Schema({
         trim: true,
         maxlength: [100, 'El número de mesas no puede tener más de 100 caracteres']
     },
-    Combo: {
-        type: Schema.Types.ObjectId,
-        ref: 'Combo',
-        required: [true, 'El combo es requerido'],
-    },
     EventTotal: {
         type: Number,
         required: [true, 'El total es requerido'],
         trim: true,
         lowercase: true,
+    },
+    EventUser: {
+        type: Schema.Types.ObjectId,
+        ref: 'User', //ROL: Cliente
+        required: [true, "El Cliente es obligatorio"]
     },
     EventStatus: {
         type: String,
