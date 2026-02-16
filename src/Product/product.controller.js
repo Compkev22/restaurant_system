@@ -1,6 +1,7 @@
 'use strict';
 
 import Product from './product.model.js';
+import Inventory from '../Inventory/inventory.model.js';
 
 // Obtener productos
 export const getProducts = async (req, res) => {
@@ -12,6 +13,7 @@ export const getProducts = async (req, res) => {
         if (estado) filter.estado = estado;
 
         const products = await Product.find(filter)
+            .populate('ingredientes.inventoryId', 'name stock unitCost')
             .limit(limit * 1)
             .skip((page - 1) * limit)
             .sort({ nombre: 1 });
@@ -35,6 +37,25 @@ export const getProducts = async (req, res) => {
 export const createProduct = async (req, res) => {
     try {
         const data = req.body;
+
+        // Valida que el arreglo de ingredientes exista
+        if (!data.ingredientes || !Array.isArray(data.ingredientes) || data.ingredientes.length === 0) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Un producto de KFC debe tener al menos un ingrediente del inventario' 
+            });
+        }
+
+        // valida que cada ingrediente exista en la base de datos
+        for (const item of data.ingredientes) {
+            const inventoryExists = await Inventory.findById(item.inventoryId);
+            if (!inventoryExists) {
+                return res.status(404).json({ 
+                    success: false, 
+                    message: `El ingrediente con ID ${item.inventoryId} no existe en el inventario` 
+                });
+            }
+        }
 
         // Si Cloudinary subió el archivo, asignamos la URL segura al modelo
         if (req.file) {
