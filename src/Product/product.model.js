@@ -3,11 +3,6 @@
 import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
-    productId: {
-        type: Number,
-        required: true,
-        unique: true
-    },
     ingredientes: [{
         inventoryId: {
             type: mongoose.Schema.Types.ObjectId,

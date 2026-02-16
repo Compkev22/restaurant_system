@@ -1,4 +1,5 @@
 import Combo from './combo.model.js';
+import Product from '../Product/product.model.js';
 
 export const getCombos = async (req, res) => {
     try {
@@ -10,6 +11,10 @@ export const getCombos = async (req, res) => {
         }
 
         const combos = await Combo.find(filter)
+            .populate({
+                    path: 'ComboList.productId',
+                    select: 'nombre precio categoria estado'
+                })
             .limit(parseInt(limit))
             .skip((parseInt(page) - 1) * parseInt(limit))
             .sort({ ComboCreatedAt: -1 });
@@ -39,8 +44,11 @@ export const getComboById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const combo = await Combo.findById(id);
-
+        const combo = await Combo.findById(id).populate({
+            path: 'ComboList.productId',
+            select: 'nombre precio categoria imagen_url estado'
+        });
+        
         if (!combo) {
             return res.status(404).json({
                 success: false,
@@ -65,6 +73,18 @@ export const createCombo = async (req, res) => {
     try {
         const comboData = req.body;
 
+        if (comboData.ComboList && comboData.ComboList.length > 0) {
+            for (const item of comboData.ComboList) {
+                const productExists = await Product.findById(item.productId);
+                if (!productExists) {
+                    return res.status(404).json({
+                        success: false,
+                        message: `El producto con ID ${item.productId} no existe`,
+                    });
+                }
+            }
+        }
+
         const combo = new Combo(comboData);
         await combo.save();
 
@@ -85,11 +105,35 @@ export const createCombo = async (req, res) => {
 export const updateCombo = async (req, res) => {
     try {
         const { id } = req.params;
+        const data = req.body;
 
-        const combo = await Combo.findByIdAndUpdate(id, req.body, {
+        // Validar productos SOLO si vienen en el body para ser actualizados
+        if (data.ComboList && Array.isArray(data.ingredientes)) {
+            // Si el arreglo viene vacío, podrías lanzar un error dependiendo de tu regla de negocio
+            if (data.ComboList.length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'El combo no puede quedarse sin productos'
+                });
+            }
+
+            // Validar la existencia de cada nuevo producto en la lista
+            for (const item of data.ComboList) {
+                const productExists = await Product.findById(item.productId);
+                if (!productExists) {
+                    return res.status(404).json({
+                        success: false,
+                        message: `El producto con ID ${item.productId} no existe. No se puede actualizar el combo.`
+                    });
+                }
+            }
+        }
+
+        // runValidators valida los tipos de datos y enums del modelo
+        const combo = await Combo.findByIdAndUpdate(id, data, {
             new: true,
             runValidators: true,
-        });
+        }).populate('ComboList.productId', 'nombre precio');
 
         if (!combo) {
             return res.status(404).json({
@@ -100,9 +144,10 @@ export const updateCombo = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: 'Combo actualizado exitosamente',
+            message: 'Combo actualizado y validado exitosamente',
             data: combo,
         });
+
     } catch (error) {
         res.status(400).json({
             success: false,
