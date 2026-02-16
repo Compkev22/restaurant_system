@@ -3,7 +3,9 @@ import { Schema, model } from 'mongoose';
 const inventorySchema = Schema({
     name: { 
         type: String, 
-        required: [true, 'El nombre es obligatorio'] 
+        required: [true, 'El nombre es obligatorio'],
+        unique: true,
+        trim: true,
     },
     description: { 
         type: String, 
