@@ -14,7 +14,6 @@ const validateFields = (req, res, next) => {
 };
 
 export const reservationValidator = [
-    body('table', 'El ID de la mesa debe ser válido').isMongoId(),
     body('client', 'El nombre del cliente es obligatorio').notEmpty(), 
     body('date', 'La fecha es obligatoria').isDate(),
     body('time', 'La hora es obligatoria').notEmpty(),

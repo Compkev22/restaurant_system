@@ -4,7 +4,7 @@ import { tableValidator } from './table.validator.js';
 
 const api = Router();
 
-api.post('/save', tableValidator, saveTable);
+api.post('/', tableValidator, saveTable);
 api.get('/', getTables);
 api.put('/:id', tableValidator, updateTable);
 api.delete('/:id', deleteTable);

@@ -14,6 +14,18 @@ const tableSchema = Schema({
         type: String, 
         enum: ['Disponible', 'Ocupada', 'Mantenimiento'], 
         default: 'Disponible' 
+    },
+    event:{
+        type: Schema.Types.ObjectId,
+        ref: 'Event',
+        required: false,
+        default: null
+    },
+    reservation:{
+        type: Schema.Types.ObjectId,
+        ref: 'Reservation',
+        required: false,
+        default: null
     }
 }, { versionKey: false });
 
