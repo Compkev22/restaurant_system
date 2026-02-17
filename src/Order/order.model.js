@@ -3,23 +3,15 @@
 import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema({
-    orderId: { // ID de la Orden
-        type: Number,
-        required: true,
-        unique: true
-    },
-    detallePedidoId: {
-        type: Number,
-        required: true
-    },
     mesaId: { 
-        type: Number,
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Table',
         required: true
     },
     empleadoId: {
-        type: Number,
+        type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'Employe'
+        ref: 'User' 
     },
     horaPedido: {
         type: Date,
@@ -29,10 +21,13 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ['Pendiente', 'En Preparacion', 'Listo', 'Entregado', 'Cancelado'],
         default: 'Pendiente'
+    },
+    total: { 
+        type: Number,
+        default: 0
     }
 }, { timestamps: true });
 
-// Índices para cocina y administración
 orderSchema.index({ estado: 1, horaPedido: 1 });
 
 export default mongoose.model('Order', orderSchema);
