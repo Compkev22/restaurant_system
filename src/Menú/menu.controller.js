@@ -1,45 +1,39 @@
-import Menu from './menu.model.js';
+'use strict';
 
-export const saveMenu = async (req, res) => {
-    try {
-        const data = req.body;
-        const item = new Menu(data);
-        await item.save();
-        return res.status(201).send({ success: true, message: 'Menú creado', item });
-    } catch (err) {
-        return res.status(500).send({ success: false, message: 'Error al guardar', err });
-    }
-};
+import Product from '../Product/product.model.js';
+import Combo from '../Combo/combo.model.js';
 
-export const getMenu = async (req, res) => {
+export const getFullMenu = async (req, res) => {
     try {
-        const items = await Menu.find();
-        return res.send({ success: true, items });
-    } catch (err) {
-        return res.status(500).send({ success: false, message: 'Error al obtener menú' });
-    }
-};
+        // 1. Buscamos solo los productos que están "Disponibles"
+        const products = await Product.find({ estado: 'Disponible' })
+            .select('nombre precio categoria imagen_url estado');
 
-// ESTAS SON LAS QUE TE FALTABAN:
-export const updateMenu = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const data = req.body;
-        const updated = await Menu.findByIdAndUpdate(id, data, { new: true });
-        if (!updated) return res.status(404).send({ success: false, message: 'Platillo no encontrado' });
-        return res.send({ success: true, message: 'Menú actualizado', updated });
-    } catch (err) {
-        return res.status(500).send({ success: false, message: 'Error al actualizar', err: err.message });
-    }
-};
+        // 2. Buscamos los combos que están "ACTIVE"
+        // Hacemos populate para ver qué trae cada combo
+        const combos = await Combo.find({ ComboStatus: 'ACTIVE' })
+            .populate({
+                path: 'ComboList.productId',
+                select: 'nombre precio'
+            })
+            .select('ComboName ComboDescription ComboPrice ComboDiscount imagen_url');
 
-export const deleteMenu = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const deleted = await Menu.findByIdAndDelete(id);
-        if (!deleted) return res.status(404).send({ success: false, message: 'Platillo no encontrado' });
-        return res.send({ success: true, message: 'Platillo eliminado' });
-    } catch (err) {
-        return res.status(500).send({ success: false, message: 'Error al eliminar', err: err.message });
+        // 3. Respondemos con ambas listas
+        res.status(200).json({
+            success: true,
+            message: 'Menú cargado exitosamente',
+            menu: {
+                individualProducts: products,
+                combos: combos
+            },
+            totalItems: products.length + combos.length
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error al generar el menú',
+            error: error.message
+        });
     }
 };

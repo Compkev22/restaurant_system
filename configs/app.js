@@ -27,7 +27,8 @@ import orderRoutes from '../src/Order/order.routes.js';
 import branchRoutes from '../src/Branch/branch.routes.js';
 import billingRoutes from '../src/Billing/billing.routes.js';
 import authRoutes from '../src/Auth/auth.routes.js';
-
+import detalleInventarioRoutes from '../src/DetalleInventario/detalleInventario.routes.js';
+import detalleComboRoutes from '../src/DetalleCombo/detalleCombo.routes.js';
 
 
 
@@ -55,6 +56,8 @@ const routes = (app) => {
     app.use(`${BASE_URL}/branch`, branchRoutes);
     app.use(`${BASE_URL}/billing`, billingRoutes);
     app.use(`${BASE_URL}/auth`, authRoutes);
+    app.use(`${BASE_URL}/detalleInventario`, detalleInventarioRoutes);
+    app.use(`${BASE_URL}/detalleCombo`, detalleComboRoutes);
 }
 
 

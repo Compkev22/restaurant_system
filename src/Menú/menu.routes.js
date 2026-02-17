@@ -1,12 +1,11 @@
+'use strict';
+
 import { Router } from 'express';
-import { saveMenu, getMenu, updateMenu, deleteMenu } from './menu.controller.js';
-import { menuValidator } from './menu.validator.js';
+import { getFullMenu } from './menu.controller.js';
 
-const api = Router();
+const router = Router();
 
-api.post('/save', menuValidator, saveMenu);
-api.get('/', getMenu);
-api.put('/:id', menuValidator, updateMenu);
-api.delete('/:id', deleteMenu);
+// Ruta principal para obtener todo el catálogo disponible
+router.get('/', getFullMenu);
 
-export default api;
+export default router;
