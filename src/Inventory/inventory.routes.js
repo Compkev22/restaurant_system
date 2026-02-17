@@ -5,8 +5,7 @@ import {
     updateInventory, 
     deleteInventory 
 } from './inventory.controller.js';
-import { inventoryValidator } from './inventory.validator.js';
-
+import { inventoryValidator } from '../../middlewares/inventory-validator.js';
 const api = Router();
 
 api.post('/save', inventoryValidator, saveInventory);
