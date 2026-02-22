@@ -3,6 +3,11 @@
 import mongoose, { Schema } from "mongoose";
 
 const eventSchema = new mongoose.Schema({
+    branchId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Branch',
+        required: true
+    },
     EventNumberOfPersons: {
         type: String,
         required: [true, 'El número de personas es requerido'],

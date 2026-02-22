@@ -3,6 +3,11 @@
 import mongoose, { Schema } from "mongoose";
 
 const billingSchema = new mongoose.Schema({
+    branchId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Branch',
+        required: true
+    },
     BillSerie: {
         type: String,
         required: [true, 'La serie de la factura es requerida'],
@@ -16,7 +21,6 @@ const billingSchema = new mongoose.Schema({
     Order: {
         type: Schema.Types.ObjectId,
         ref: 'Order',
-        //required: [true, 'El pedido es requerido'], //Quitar el comentario de aquí cuando se unan :D
         default: null
     },
     BillSubtotal: {

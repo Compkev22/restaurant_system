@@ -1,6 +1,11 @@
 import { Schema, model } from 'mongoose';
 
 const tableSchema = Schema({
+    branchId: {
+    type: Schema.Types.ObjectId,
+    ref: 'Branch',
+    required: true
+    },
     numberTable: { 
         type: Number, 
         required: [true, 'El número de mesa es obligatorio'], 

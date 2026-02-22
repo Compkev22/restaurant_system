@@ -3,6 +3,11 @@
 import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema({
+    branchId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Branch',
+        required: true
+    },
     mesaId: { 
         type: mongoose.Schema.Types.ObjectId, 
         ref: 'Table',

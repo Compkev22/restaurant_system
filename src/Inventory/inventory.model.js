@@ -1,6 +1,11 @@
 import { Schema, model } from 'mongoose';
 
 const inventorySchema = Schema({
+    branchId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Branch',
+        required: true
+    },
     name: { 
         type: String, 
         required: [true, 'El nombre es obligatorio'] 
