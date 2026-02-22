@@ -1,90 +1,65 @@
-'use strict';
+import { body, validationResult } from 'express-validator';
 
-import { body, param } from 'express-validator';
-import { checkValidators } from './check.validators.js';
+const validateFields = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            success: false,
+            message: 'Error de validación en el evento',
+            errors: errors.array()
+        });
+    }
+    next();
+};
 
-export const validateCreateEvent = [
-    body('EventNumberOfPersons')
-        .trim()
+export const eventValidator = [
+
+    body('branchId', 'La sucursal es obligatoria')
         .notEmpty()
-        .withMessage('El número de personas es requerido')
-        .isLength({ max: 20 })
-        .withMessage('El número de personas no puede tener más de 20 caracteres'),
+        .isMongoId(),
 
-    body('EventNumberOfTables')
-        .trim()
+    body('clientId', 'El cliente es obligatorio')
         .notEmpty()
-        .withMessage('El número de mesas es requerido')
-        .isLength({ max: 100 })
-        .withMessage('El número de mesas no puede tener más de 100 caracteres'),
+        .isMongoId(),
 
-    body('Combo')
+    body('name', 'El nombre del evento es obligatorio')
         .notEmpty()
-        .withMessage('El combo es requerido')
-        .isMongoId()
-        .withMessage('El combo debe ser un ObjectId válido'),
+        .isString()
+        .trim(),
 
-    body('EventTotal')
+    body('eventDate', 'La fecha del evento es obligatoria')
         .notEmpty()
-        .withMessage('El total es requerido')
-        .isNumeric()
-        .withMessage('El total debe ser un número válido'),
+        .isISO8601()
+        .toDate(),
 
-    body('EventStatus')
+    body('startTime', 'La hora de inicio es obligatoria')
+        .notEmpty()
+        .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+        .withMessage('La hora debe tener formato HH:mm'),
+
+    body('endTime', 'La hora de finalización es obligatoria')
+        .notEmpty()
+        .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/)
+        .withMessage('La hora debe tener formato HH:mm'),
+
+    body('numberOfPersons', 'Debe indicar la cantidad de personas')
+        .notEmpty()
+        .isInt({ min: 1 }),
+
+    body('tables', 'Debe enviar un arreglo de mesas')
+        .isArray({ min: 1 }),
+
+    body('tables.*', 'Cada mesa debe ser un ID válido')
+        .isMongoId(),
+
+    body('status')
         .optional()
-        .isIn(['ACTIVE', 'INACTIVE'])
-        .withMessage('Estado no válido'),
+        .isIn(['Pendiente', 'Confirmado', 'Cancelado', 'Finalizado']),
 
-    checkValidators,
-];
-
-export const validateUpdateEventRequest = [
-    param('id')
-        .isMongoId()
-        .withMessage('ID debe ser un ObjectId'),
-
-    body('EventNumberOfPersons')
+    body('notes')
         .optional()
-        .trim()
-        .isLength({ max: 20 })
-        .withMessage('El número de personas no puede tener más de 20 caracteres'),
+        .isString()
+        .trim(),
 
-    body('EventNumberOfTables')
-        .optional()
-        .trim()
-        .isLength({ max: 100 })
-        .withMessage('El número de mesas no puede tener más de 100 caracteres'),
-
-    body('Combo')
-        .optional()
-        .isMongoId()
-        .withMessage('El combo debe ser un ObjectId válido'),
-
-    body('EventTotal')
-        .optional()
-        .isNumeric()
-        .withMessage('El total debe ser un número válido'),
-
-    body('EventStatus')
-        .optional()
-        .isIn(['ACTIVE', 'INACTIVE'])
-        .withMessage('Estado no válido'),
-
-    checkValidators,
-];
-
-export const validateEventStatusChange = [
-    param('id')
-        .isMongoId()
-        .withMessage('ID debe ser un ObjectId'),
-
-    checkValidators,
-];
-
-export const validateGetEventById = [
-    param('id')
-        .isMongoId()
-        .withMessage('ID debe ser un ObjectId'),
-
-    checkValidators,
+    validateFields
 ];
