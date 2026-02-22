@@ -2,13 +2,12 @@
 
 import Order from '../../../../Users/Informatica/Documents/restaurant_system-ft-RobertoMilian/restaurant_system-ft-RobertoMilian/src/Order/order.model.js';
 import OrderDetail from './orderDetail.model.js';
+import Product from '../Product/product.model.js';
+import Combo from '../Combo/combo.model.js';
 
-/**
- * Crear item de orden
- */
 export const createOrderDetail = async (req, res) => {
     try {
-        const { order, productoId, comboId, cantidad, precio } = req.body;
+        const { order, productoId, comboId, cantidad } = req.body;
 
         const existingOrder = await Order.findById(order);
         if (!existingOrder) {
@@ -18,7 +17,31 @@ export const createOrderDetail = async (req, res) => {
             });
         }
 
-        const subtotal = cantidad * precio;
+        let precio;
+
+        if (productoId) {
+            const product = await Product.findById(productoId);
+            if (!product) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Producto no encontrado'
+                });
+            }
+            precio = product.precio;
+        }
+
+        if (comboId) {
+            const combo = await Combo.findById(comboId);
+            if (!combo) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Combo no encontrado'
+                });
+            }
+            precio = combo.ComboPrice;
+        }
+
+        const subtotal = precio * cantidad;
 
         const detail = await OrderDetail.create({
             order,
@@ -48,9 +71,6 @@ export const createOrderDetail = async (req, res) => {
     }
 };
 
-/**
- * Obtener items por orden
- */
 export const getOrderDetailsByOrder = async (req, res) => {
     try {
         const { orderId } = req.params;
@@ -74,9 +94,7 @@ export const getOrderDetailsByOrder = async (req, res) => {
     }
 };
 
-/**
- * Actualizar item
- */
+
 export const updateOrderDetail = async (req, res) => {
     try {
         const { id } = req.params;
@@ -89,13 +107,13 @@ export const updateOrderDetail = async (req, res) => {
             });
         }
 
-        const cantidad = req.body.cantidad ?? detail.cantidad;
-        const precio = req.body.precio ?? detail.precio;
-        const nuevoSubtotal = cantidad * precio;
+        const nuevaCantidad = req.body.cantidad ?? detail.cantidad;
+
+        const nuevoSubtotal = nuevaCantidad * detail.precio;
         const diferencia = nuevoSubtotal - detail.subtotal;
 
         detail.set({
-            ...req.body,
+            cantidad: nuevaCantidad,
             subtotal: nuevoSubtotal
         });
 
