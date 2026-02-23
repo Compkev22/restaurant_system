@@ -1,4 +1,3 @@
-event-validator
 import { body, param } from 'express-validator';
 import { checkValidators } from './check.validators.js';
 
