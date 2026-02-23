@@ -1,3 +1,5 @@
+'use strict';
+
 import Table from './table.model.js';
 
 export const saveTable = async (req, res) => {
@@ -7,13 +9,16 @@ export const saveTable = async (req, res) => {
         await table.save();
         return res.status(201).send({ success: true, message: 'Mesa registrada', table });
     } catch (err) {
-        return res.status(500).send({ success: false, message: 'Error al registrar mesa', err });
+        return res.status(500).send({ success: false, message: 'Error al registrar mesa', err: err.message });
     }
 };
 
 export const getTables = async (req, res) => {
     try {
-        const tables = await Table.find();
+        const { TableStatus } = req.query;
+        const filter = { TableStatus: TableStatus || 'ACTIVE' };
+
+        const tables = await Table.find(filter).populate('branchId', 'nombre');
         return res.send({ success: true, tables });
     } catch (err) {
         return res.status(500).send({ success: false, message: 'Error al obtener mesas' });
@@ -32,27 +37,25 @@ export const updateTable = async (req, res) => {
     }
 };
 
-export const deleteTable = async (req, res) => {
+export const changeTableStatus = async (req, res) => {
     try {
         const { id } = req.params;
-        const deleted = await Table.findByIdAndDelete(id);
-        
-        if (!deleted) {
-            return res.status(404).send({ 
-                success: false, 
-                message: 'Mesa no encontrada' 
-            });
-        }
-        
+        const table = await Table.findById(id);
+
+        if (!table) return res.status(404).send({ success: false, message: 'Mesa no encontrada' });
+
+        // Lógica de Soft Delete igual a las otras entidades
+        table.TableStatus = table.TableStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+        table.deletedAt = table.TableStatus === 'INACTIVE' ? new Date() : null;
+
+        await table.save();
+
         return res.send({ 
             success: true, 
-            message: 'Mesa eliminada físicamente' 
+            message: `Estado de mesa cambiado a ${table.TableStatus}`, 
+            table 
         });
     } catch (err) {
-        return res.status(500).send({ 
-            success: false, 
-            message: 'Error al eliminar la mesa', 
-            err: err.message 
-        });
+        return res.status(500).send({ success: false, message: 'Error al cambiar estado', err: err.message });
     }
 };
