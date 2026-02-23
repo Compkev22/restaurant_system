@@ -3,11 +3,18 @@
 import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
-    productId: {
-        type: Number,
-        required: true,
-        unique: true
-    },
+    ingredientes: [{
+        inventoryId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Inventory',
+            required: true
+        },
+        cantidadUsada: { 
+            type: Number, 
+            required: true,
+            default: 1 // 1 pan, 2 lechugas, 2 carnes, etc....
+        }
+    }],
     nombre: {
         type: String,
         required: true,
@@ -37,6 +44,6 @@ const productSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Índice para búsqueda por nombre y filtrado por categoría/estado
-productSchema.index({ nombre: 1, categoria: 1, estado: 1 });
+productSchema.index({ nombre: 1, categoria: 1, inventoryId: 1 });
 
 export default mongoose.model('Product', productSchema);
