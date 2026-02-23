@@ -13,7 +13,7 @@ import {
     validateUpdateOrderDetail,
     validateOrderIdParam,
     validateOrderDetailIdParam
-} from '../../../../Users/Informatica/Documents/restaurant_system-ft-RobertoMilian/restaurant_system-ft-RobertoMilian/middlewares/orderDetail-validator.js';
+} from '../../middlewares/orderDetail-validator.js';
 
 const router = Router();
 

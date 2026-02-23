@@ -1,9 +1,10 @@
 'use strict';
 
-import Order from '../../../../Users/Informatica/Documents/restaurant_system-ft-RobertoMilian/restaurant_system-ft-RobertoMilian/src/Order/order.model.js';
+import Order from '../Order/order.model.js';
 import OrderDetail from './orderDetail.model.js';
 import Product from '../Product/product.model.js';
 import Combo from '../Combo/combo.model.js';
+import Inventory from '../Inventory/inventory.model.js';
 
 export const createOrderDetail = async (req, res) => {
     try {
@@ -28,6 +29,28 @@ export const createOrderDetail = async (req, res) => {
                 });
             }
             precio = product.precio;
+
+            for (const ingrediente of product.ingredientes) {
+                const inventaryItem = ingrediente.inventoryId;
+                const cantidadNecesaria = ingrediente.cantidadUsada * cantidad;
+
+                if (inventaryItem.stock < cantidadNecesaria) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'No hay suficiente stock para crear el producto'
+                    });
+                }
+
+            }
+
+            for (const ingrediente of product.ingredientes) {
+                const cantidadNecesaria = ingrediente.cantidadUsada * cantidad;
+
+                await Inventory.findByIdAndUpdate(
+                    ingrediente.inventoryId,
+                    { $inc: { stock: -cantidadNecesaria } }
+                );
+            }
         }
 
         if (comboId) {

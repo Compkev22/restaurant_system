@@ -8,10 +8,10 @@ import {
 } from './event.controller.js';
 
 import {
+    validateGetEventById,
     validateCreateEvent,
     validateUpdateEventRequest,
-    validateEventStatusChange,
-    validateGetEventById
+    validateEventStatusChange
 } from '../../middlewares/event-validator.js';
 
 const router = Router();

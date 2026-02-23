@@ -1,22 +1,22 @@
 'use strict';
 
-import mongoose from 'mongoose';
+import { Schema, mongoose } from 'mongoose';
 
-const orderSchema = new mongoose.Schema({
+const orderSchema = new Schema({
     branchId: {
         type: Schema.Types.ObjectId,
         ref: 'Branch',
         required: true
     },
-    mesaId: { 
-        type: mongoose.Schema.Types.ObjectId, 
+    mesaId: {
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Table',
         required: true
     },
     empleadoId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'User' 
+        ref: 'User'
     },
     horaPedido: {
         type: Date,
@@ -27,7 +27,7 @@ const orderSchema = new mongoose.Schema({
         enum: ['Pendiente', 'En Preparacion', 'Listo', 'Entregado', 'Cancelado'],
         default: 'Pendiente'
     },
-    total: { 
+    total: {
         type: Number,
         default: 0
     }
