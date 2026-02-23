@@ -1,45 +1,41 @@
-import Menu from './menu.model.js';
-
-export const saveMenu = async (req, res) => {
-    try {
-        const data = req.body;
-        const item = new Menu(data);
-        await item.save();
-        return res.status(201).send({ success: true, message: 'Menú creado', item });
-    } catch (err) {
-        return res.status(500).send({ success: false, message: 'Error al guardar', err });
-    }
-};
+import Product from '../Product/product.model.js';
+import Combo from '../Combo/combo.model.js';
 
 export const getMenu = async (req, res) => {
     try {
-        const items = await Menu.find();
-        return res.send({ success: true, items });
-    } catch (err) {
-        return res.status(500).send({ success: false, message: 'Error al obtener menú' });
-    }
-};
+        const products = await Product.find({ status: 'Disponible' });
 
-// ESTAS SON LAS QUE TE FALTABAN:
-export const updateMenu = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const data = req.body;
-        const updated = await Menu.findByIdAndUpdate(id, data, { new: true });
-        if (!updated) return res.status(404).send({ success: false, message: 'Platillo no encontrado' });
-        return res.send({ success: true, message: 'Menú actualizado', updated });
-    } catch (err) {
-        return res.status(500).send({ success: false, message: 'Error al actualizar', err: err.message });
-    }
-};
+        const combos = await Combo.find({ status: 'Disponible' });
 
-export const deleteMenu = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const deleted = await Menu.findByIdAndDelete(id);
-        if (!deleted) return res.status(404).send({ success: false, message: 'Platillo no encontrado' });
-        return res.send({ success: true, message: 'Platillo eliminado' });
+        const menu = [
+            ...products.map(product => ({
+                _id: product._id,
+                name: product.name,
+                description: product.description,
+                price: product.price,
+                type: 'Individual'
+            })),
+            ...combos.map(combo => ({
+                _id: combo._id,
+                name: combo.name,
+                description: combo.description,
+                price: combo.price,
+                type: 'Combo'
+            }))
+        ];
+
+        return res.status(200).send({
+            success: true,
+            message: 'Menú obtenido correctamente',
+            total: menu.length,
+            menu
+        });
+
     } catch (err) {
-        return res.status(500).send({ success: false, message: 'Error al eliminar', err: err.message });
+        return res.status(500).send({
+            success: false,
+            message: 'Error al obtener el menú',
+            error: err.message
+        });
     }
 };
