@@ -47,10 +47,15 @@ const routes = (app) => {
     app.use(`${BASE_URL}/events`, eventRoutes);
     app.use(`${BASE_URL}/inventory`, inventoryRoutes);
     app.use(`${BASE_URL}/menu`, menuRoutes);
-    app.use(`${BASE_URL}/tables`, tableRoutes);
+    // app.use(`${BASE_URL}/tables`, tableRoutes);
     app.use(`${BASE_URL}/reservations`, reservationRoutes);
+<<<<<<< HEAD
     //app.use(`${BASE_URL}/sales`, saleRoutes);
     //app.use(`${BASE_URL}/employee`, employeeRoutes);
+=======
+    app.use(`${BASE_URL}/sales`, saleRoutes);
+   // app.use(`${BASE_URL}/employee`, employeeRoutes);
+>>>>>>> 3a710b3 (T69/ Implementar Soft Delete a la entidad Branch)
     app.use(`${BASE_URL}/product`, productRoutes);
     app.use(`${BASE_URL}/order`, orderRoutes);
     app.use(`${BASE_URL}/orderDetail`, orderDetailRoutes);

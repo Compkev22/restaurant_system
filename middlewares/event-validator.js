@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+event-validator
+>>>>>>> 3a710b3 (T69/ Implementar Soft Delete a la entidad Branch)
 import { body, param } from 'express-validator';
 import { checkValidators } from './check.validators.js';
 

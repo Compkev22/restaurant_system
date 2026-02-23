@@ -110,9 +110,15 @@ export const updateEvent = async (req, res) => {
                 runValidators: true,
             }
         )
+<<<<<<< HEAD
             .populate('branchId')
             .populate('clientId')
             .populate('tables');
+=======
+        .populate('branchId')
+        .populate('clientId')
+        .populate('tables');
+>>>>>>> 3a710b3 (T69/ Implementar Soft Delete a la entidad Branch)
 
         if (!event) {
             return res.status(404).json({
