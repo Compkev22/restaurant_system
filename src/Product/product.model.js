@@ -9,8 +9,8 @@ const productSchema = new mongoose.Schema({
             ref: 'Inventory',
             required: true
         },
-        cantidadUsada: { 
-            type: Number, 
+        cantidadUsada: {
+            type: Number,
             required: true,
             default: 1 // 1 pan, 2 lechugas, 2 carnes, etc....
         }

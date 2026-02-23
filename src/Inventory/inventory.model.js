@@ -6,22 +6,22 @@ const inventorySchema = Schema({
         ref: 'Branch',
         required: true
     },
-    name: { 
-        type: String, 
-        required: [true, 'El nombre es obligatorio'] 
+    name: {
+        type: String,
+        required: [true, 'El nombre es obligatorio']
     },
-    description: { 
-        type: String, 
-        required: [true, 'La descripción es obligatoria'] 
+    description: {
+        type: String,
+        required: [true, 'La descripción es obligatoria']
     },
-    stock: { 
-        type: Number, 
+    stock: {
+        type: Number,
         required: [true, 'El stock es obligatorio'],
-        default: 0 
+        default: 0
     },
-    unitCost: { 
-        type: Number, 
-        required: [true, 'El costo unitario es obligatorio'] 
+    unitCost: {
+        type: Number,
+        required: [true, 'El costo unitario es obligatorio']
     }
 }, { versionKey: false });
 

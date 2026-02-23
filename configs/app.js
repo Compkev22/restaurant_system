@@ -5,7 +5,7 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import helmet from 'helmet';
-import { corsOptions } from './cors-configuration.js'; 
+import { corsOptions } from './cors-configuration.js';
 import { dbConnection } from './db.js';
 import { helmetConfiguration } from './helmet-configuration.js';
 import { requestLimit } from '../middlewares/request-limit.js';
@@ -20,10 +20,11 @@ import inventoryRoutes from '../src/Inventory/inventory.routes.js';
 import menuRoutes from '../src/Menú/menu.routes.js';
 import tableRoutes from '../src/Table/table.routes.js';
 import reservationRoutes from '../src/Reservation/reservation.routes.js';
-import saleRoutes from '../src/Sale/sale.routes.js';
-import employeeRoutes from '../src/Employee/employee.routes.js';
+//import saleRoutes from '../src/Sale/sale.routes.js';
+//import employeeRoutes from '../src/Employee/employee.routes.js';
 import productRoutes from '../src/Product/product.routes.js';
 import orderRoutes from '../src/Order/order.routes.js';
+import orderDetailRoutes from '../src/OrderDetail/orderDetail.routes.js';
 import branchRoutes from '../src/Branch/branch.routes.js';
 import billingRoutes from '../src/Billing/billing.routes.js';
 import authRoutes from '../src/Auth/auth.routes.js';
@@ -48,10 +49,11 @@ const routes = (app) => {
     app.use(`${BASE_URL}/menu`, menuRoutes);
     app.use(`${BASE_URL}/tables`, tableRoutes);
     app.use(`${BASE_URL}/reservations`, reservationRoutes);
-    app.use(`${BASE_URL}/sales`, saleRoutes);
-    app.use(`${BASE_URL}/employee`, employeeRoutes);
+    //app.use(`${BASE_URL}/sales`, saleRoutes);
+    //app.use(`${BASE_URL}/employee`, employeeRoutes);
     app.use(`${BASE_URL}/product`, productRoutes);
     app.use(`${BASE_URL}/order`, orderRoutes);
+    app.use(`${BASE_URL}/orderDetail`, orderDetailRoutes);
     app.use(`${BASE_URL}/branch`, branchRoutes);
     app.use(`${BASE_URL}/billing`, billingRoutes);
     app.use(`${BASE_URL}/auth`, authRoutes);
@@ -67,7 +69,7 @@ const initServer = async () => {
     try {
         await dbConnection();
         middleware(app);
-        
+
         // Las rutas deben cargarse ANTES que el manejador de errores
         routes(app);
 
