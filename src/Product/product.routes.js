@@ -1,7 +1,7 @@
 'use strict';
 
 import { Router } from 'express';
-import { getProducts, createProduct, updateProduct } from './product.controller.js';
+import { getProducts, createProduct, updateProduct, changeProductStatus } from './product.controller.js';
 import { validateCreateProduct, validateProductId } from '../../middlewares/product.validator.js';
 import { uploadProductImage } from '../../middlewares/file-uploader.js';
 

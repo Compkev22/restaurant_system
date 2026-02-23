@@ -1,7 +1,7 @@
 'use strict';
 
 import { Router } from 'express';
-import { getBranches, createBranch, updateBranch } from '../Branch/branch.controller.js';
+import { getBranches, createBranch, updateBranch, changeBranchStatus } from '../Branch/branch.controller.js';
 import { validateCreateBranch, validateUpdateBranch } from '../../middlewares/branch.validator.js';
 
 const router = Router();
