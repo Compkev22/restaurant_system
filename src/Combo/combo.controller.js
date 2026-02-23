@@ -1,3 +1,5 @@
+'use strict';
+
 import Combo from './combo.model.js';
 
 export const getCombos = async (req, res) => {
@@ -5,9 +7,8 @@ export const getCombos = async (req, res) => {
         const { page = 1, limit = 10, ComboStatus } = req.query;
 
         const filter = {};
-        if (ComboStatus) {
-            filter.ComboStatus = ComboStatus;
-        }
+        // Filtro por defecto para Soft Delete
+        filter.ComboStatus = ComboStatus || 'ACTIVE';
 
         const combos = await Combo.find(filter)
             .limit(parseInt(limit))
@@ -125,8 +126,12 @@ export const changeComboStatus = async (req, res) => {
             });
         }
 
+        // Alternar estado
         combo.ComboStatus =
             combo.ComboStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+        
+        // Manejo de fecha de eliminación
+        combo.deletedAt = combo.ComboStatus === 'INACTIVE' ? new Date() : null;
 
         await combo.save();
 
