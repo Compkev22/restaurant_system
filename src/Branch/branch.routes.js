@@ -9,5 +9,5 @@ const router = Router();
 router.get('/', getBranches);
 router.post('/', validateCreateBranch, createBranch);
 router.put('/:id', validateUpdateBranch, updateBranch);
-
+router.patch('/:id/status', changeBranchStatus);
 export default router;
