@@ -1,19 +1,21 @@
-'use strict';
-
 import Combo from './combo.model.js';
+import Product from '../Product/product.model.js';
 
+// Obtener combos (filtra ACTIVE por defecto)
 export const getCombos = async (req, res) => {
     try {
         const { page = 1, limit = 10, ComboStatus } = req.query;
 
-        const filter = {};
-        // Filtro por defecto para Soft Delete
-        filter.ComboStatus = ComboStatus || 'ACTIVE';
+        const filter = { ComboStatus: ComboStatus || 'ACTIVE' };
 
         const combos = await Combo.find(filter)
+            .populate({
+                path: 'ComboList.productId',
+                select: 'nombre precio categoria estado'
+            })
             .limit(parseInt(limit))
             .skip((parseInt(page) - 1) * parseInt(limit))
-            .sort({ ComboCreatedAt: -1 });
+            .sort({ createdAt: -1 });
 
         const total = await Combo.countDocuments(filter);
 
@@ -27,6 +29,7 @@ export const getCombos = async (req, res) => {
                 limit: parseInt(limit),
             },
         });
+
     } catch (error) {
         res.status(500).json({
             success: false,
@@ -36,11 +39,15 @@ export const getCombos = async (req, res) => {
     }
 };
 
+// Obtener combo por ID 
 export const getComboById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const combo = await Combo.findById(id);
+        const combo = await Combo.findById(id).populate({
+            path: 'ComboList.productId',
+            select: 'nombre precio categoria imagen_url estado'
+        });
 
         if (!combo) {
             return res.status(404).json({
@@ -53,6 +60,7 @@ export const getComboById = async (req, res) => {
             success: true,
             data: combo,
         });
+
     } catch (error) {
         res.status(500).json({
             success: false,
@@ -62,9 +70,22 @@ export const getComboById = async (req, res) => {
     }
 };
 
+// Crear combo
 export const createCombo = async (req, res) => {
     try {
         const comboData = req.body;
+
+        if (comboData.ComboList && comboData.ComboList.length > 0) {
+            for (const item of comboData.ComboList) {
+                const productExists = await Product.findById(item.productId);
+                if (!productExists) {
+                    return res.status(404).json({
+                        success: false,
+                        message: `El producto con ID ${item.productId} no existe`,
+                    });
+                }
+            }
+        }
 
         const combo = new Combo(comboData);
         await combo.save();
@@ -74,6 +95,7 @@ export const createCombo = async (req, res) => {
             message: 'Combo creado exitosamente',
             data: combo,
         });
+
     } catch (error) {
         res.status(400).json({
             success: false,
@@ -83,14 +105,36 @@ export const createCombo = async (req, res) => {
     }
 };
 
+// Actualizar combo
 export const updateCombo = async (req, res) => {
     try {
         const { id } = req.params;
+        const data = req.body;
 
-        const combo = await Combo.findByIdAndUpdate(id, req.body, {
+        if (data.ComboList && Array.isArray(data.ComboList)) {
+
+            if (data.ComboList.length === 0) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'El combo no puede quedarse sin productos'
+                });
+            }
+
+            for (const item of data.ComboList) {
+                const productExists = await Product.findById(item.productId);
+                if (!productExists) {
+                    return res.status(404).json({
+                        success: false,
+                        message: `El producto con ID ${item.productId} no existe`
+                    });
+                }
+            }
+        }
+
+        const combo = await Combo.findByIdAndUpdate(id, data, {
             new: true,
             runValidators: true,
-        });
+        }).populate('ComboList.productId', 'nombre precio');
 
         if (!combo) {
             return res.status(404).json({
@@ -104,6 +148,7 @@ export const updateCombo = async (req, res) => {
             message: 'Combo actualizado exitosamente',
             data: combo,
         });
+
     } catch (error) {
         res.status(400).json({
             success: false,
@@ -126,12 +171,11 @@ export const changeComboStatus = async (req, res) => {
             });
         }
 
-        // Alternar estado
         combo.ComboStatus =
             combo.ComboStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-        
-        // Manejo de fecha de eliminación
-        combo.deletedAt = combo.ComboStatus === 'INACTIVE' ? new Date() : null;
+
+        combo.deletedAt =
+            combo.ComboStatus === 'INACTIVE' ? new Date() : null;
 
         await combo.save();
 
@@ -140,6 +184,7 @@ export const changeComboStatus = async (req, res) => {
             message: `Combo ${combo.ComboStatus === 'ACTIVE' ? 'activado' : 'desactivado'} exitosamente`,
             data: combo,
         });
+
     } catch (error) {
         res.status(500).json({
             success: false,
