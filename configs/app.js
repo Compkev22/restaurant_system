@@ -1,6 +1,6 @@
 'use strict';
 
-// Importaciones
+//Importaciones
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
@@ -18,20 +18,19 @@ import combosRoutes from '../src/Combo/combo.routes.js';
 import eventRoutes from '../src/Event/event.routes.js';
 import inventoryRoutes from '../src/Inventory/inventory.routes.js';
 import menuRoutes from '../src/Menú/menu.routes.js';
-import tableRoutes from '../src/Table/table.routes.js'; // ACTIVADO
+import tableRoutes from '../src/Table/table.routes.js';
 import reservationRoutes from '../src/Reservation/reservation.routes.js';
-<<<<<<< HEAD
 //import saleRoutes from '../src/Sale/sale.routes.js';
 //import employeeRoutes from '../src/Employee/employee.routes.js';
-=======
-// SE ELIMINARON LAS LÍNEAS DE SALE Y EMPLOYEE QUE NO EXISTEN
->>>>>>> e448b61 (T70/ Finalizar configuraciones y limpieza de rutas tras implementar Soft Delete)
 import productRoutes from '../src/Product/product.routes.js';
 import orderRoutes from '../src/Order/order.routes.js';
 import orderDetailRoutes from '../src/OrderDetail/orderDetail.routes.js';
 import branchRoutes from '../src/Branch/branch.routes.js';
 import billingRoutes from '../src/Billing/billing.routes.js';
 import authRoutes from '../src/Auth/auth.routes.js';
+
+
+
 
 const middleware = (app) => {
     app.use(helmet(helmetConfiguration));
@@ -48,18 +47,10 @@ const routes = (app) => {
     app.use(`${BASE_URL}/events`, eventRoutes);
     app.use(`${BASE_URL}/inventory`, inventoryRoutes);
     app.use(`${BASE_URL}/menu`, menuRoutes);
-    app.use(`${BASE_URL}/tables`, tableRoutes); // ACTIVADO
+    // app.use(`${BASE_URL}/tables`, tableRoutes);
     app.use(`${BASE_URL}/reservations`, reservationRoutes);
-<<<<<<< HEAD
-<<<<<<< HEAD
     //app.use(`${BASE_URL}/sales`, saleRoutes);
     //app.use(`${BASE_URL}/employee`, employeeRoutes);
-=======
-    app.use(`${BASE_URL}/sales`, saleRoutes);
-   // app.use(`${BASE_URL}/employee`, employeeRoutes);
->>>>>>> 3a710b3 (T69/ Implementar Soft Delete a la entidad Branch)
-=======
->>>>>>> e448b61 (T70/ Finalizar configuraciones y limpieza de rutas tras implementar Soft Delete)
     app.use(`${BASE_URL}/product`, productRoutes);
     app.use(`${BASE_URL}/order`, orderRoutes);
     app.use(`${BASE_URL}/orderDetail`, orderDetailRoutes);
@@ -68,6 +59,9 @@ const routes = (app) => {
     app.use(`${BASE_URL}/auth`, authRoutes);
 }
 
+
+
+
 const initServer = async () => {
     const app = express();
     const PORT = process.env.PORT || 3001;
@@ -75,12 +69,11 @@ const initServer = async () => {
     try {
         await dbConnection();
         middleware(app);
-<<<<<<< HEAD
 
         // Las rutas deben cargarse ANTES que el manejador de errores
-=======
->>>>>>> e448b61 (T70/ Finalizar configuraciones y limpieza de rutas tras implementar Soft Delete)
         routes(app);
+
+        // El manejador de errores siempre debe ir al final
         app.use(errorHandler);
 
         app.listen(PORT, () => {

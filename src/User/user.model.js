@@ -3,12 +3,6 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-    UserNIT: {
-        type: String,
-        required: [true, 'El NIT es requerido'],
-        trim: true,
-        maxlength: [20, 'El NIT no puede tener más de 20 caracteres'],
-    },
     UserName: {
         type: String,
         required: [true, 'El nombre es requerido'],
@@ -34,8 +28,8 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['ADMIN', 'CLIENT', 'WAITER'],
-        default: 'CLIENT'
+        enum: ['ADMIN', 'CLIENT', 'EMPLOYEE'],
+        default: 'EMPLOYEE'
   },
     UserStatus: {
         type: String,

@@ -17,7 +17,7 @@ export const validateCreateProduct = [
 
     body('imagen_url')
         .optional()
-        .isURL().withMessage('URL de imagen no válida'),
+        .isString().withMessage('URL de imagen no válida'),
 
     body('estado')
         .optional()
