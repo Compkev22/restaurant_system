@@ -28,15 +28,20 @@ const branchSchema = new mongoose.Schema({
     capacidadMesas: {
         type: Number,
         default: 0
-    },
+   },
     tieneAutoservicio: {
         type: Boolean,
         default: true
     },
-    estado: {
+    // Estandarizamos a BranchStatus para el Soft Delete
+    BranchStatus: {
         type: String,
-        enum: ['Activa', 'Inactiva'],
-        default: 'Activa'
+        enum: ['ACTIVE', 'INACTIVE'],
+        default: 'ACTIVE'
+    },
+    deletedAt: {
+        type: Date,
+        default: null
     }
 }, { timestamps: true });
 

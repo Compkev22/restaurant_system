@@ -36,11 +36,16 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['ADMIN', 'CLIENT', 'WAITER'],
         default: 'CLIENT'
-    },
+  },
     UserStatus: {
         type: String,
         enum: ['ACTIVE', 'INACTIVE'],
         default: 'ACTIVE'
+    },
+    //  campo para el Soft Delete
+    deletedAt: {
+        type: Date,
+        default: null
     },
     UserCreatedAt: {
         type: Date,

@@ -4,7 +4,7 @@ import { Schema, mongoose } from 'mongoose';
 
 const orderSchema = new Schema({
     branchId: {
-        type: Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId, 
         ref: 'Branch',
         required: true
     },
@@ -14,7 +14,7 @@ const orderSchema = new Schema({
         required: true
     },
     empleadoId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId, 
         required: true,
         ref: 'User'
     },
@@ -31,8 +31,8 @@ const orderSchema = new Schema({
         type: Number,
         default: 0
     }
-}, { timestamps: true });
+}, { versionKey: false, timestamps: true });
 
 orderSchema.index({ estado: 1, horaPedido: 1 });
 
-export default mongoose.model('Order', orderSchema);
+export default model('Order', orderSchema);

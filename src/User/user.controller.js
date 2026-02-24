@@ -1,13 +1,12 @@
 import User from './user.model.js';
 
+// Obtener todos los usuarios (Filtra activos por defecto)
 export const getUsers = async (req, res) => {
     try {
         const { page = 1, limit = 10, UserStatus } = req.query;
 
-        const filter = {};
-        if (UserStatus) {
-            filter.UserStatus = UserStatus;
-        }
+        // Soft Delete: Filtramos por ACTIVE 
+        const filter = { UserStatus: UserStatus || 'ACTIVE' };
 
         const users = await User.find(filter)
             .limit(parseInt(limit))
@@ -35,6 +34,7 @@ export const getUsers = async (req, res) => {
     }
 };
 
+// Obtener un usuario por ID (Sin alterar el estado)
 export const getUserById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -61,6 +61,7 @@ export const getUserById = async (req, res) => {
     }
 };
 
+// Crear usuario
 export const createUser = async (req, res) => {
     try {
         const userData = req.body;
@@ -82,6 +83,7 @@ export const createUser = async (req, res) => {
     }
 };
 
+// Actualizar datos del usuario
 export const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -112,6 +114,7 @@ export const updateUser = async (req, res) => {
     }
 };
 
+// Soft Delete 
 export const changeUserStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -125,8 +128,11 @@ export const changeUserStatus = async (req, res) => {
             });
         }
 
-        user.UserStatus =
-            user.UserStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+        // Cambio de estado 
+        user.UserStatus = user.UserStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+        
+        // Manejo de la fecha de Soft Delete
+        user.deletedAt = user.UserStatus === 'INACTIVE' ? new Date() : null;
 
         await user.save();
 

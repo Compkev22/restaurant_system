@@ -29,6 +29,11 @@ const comboSchema = new mongoose.Schema({
         enum: ['ACTIVE', 'INACTIVE'],
         default: 'ACTIVE'
     },
+    // Agregamos deletedAt para manejar el Soft Delete
+    deletedAt: {
+        type: Date,
+        default: null
+    },
     ComboCreatedAt: {
         type: Date,
         default: Date.now
