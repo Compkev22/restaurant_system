@@ -9,7 +9,9 @@ const validateFields = (req, res, next) => {
 };
 
 export const tableValidator = [
-    body('numberTable', 'El número de mesa debe ser un número positivo').isInt({ min: 1 }),
+    body('numberTable')
+        .optional()
+        .isInt({ min: 1 }).withMessage('El número de mesa debe ser un número positivo'),
     body('capacity', 'La capacidad debe ser al menos para 1 persona').isInt({ min: 1 }),
     validateFields
 ];
