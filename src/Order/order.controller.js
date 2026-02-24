@@ -78,9 +78,10 @@ export const getOrderById = async (req, res) => {
 
 export const createOrder = async (req, res) => {
     try {
-        const { mesaId, empleadoId } = req.body;
+        const { branchId, mesaId, empleadoId } = req.body;
 
         const order = await Order.create({
+            branchId,
             mesaId,
             empleadoId,
             total: 0,
@@ -109,7 +110,8 @@ export const updateOrder = async (req, res) => {
             runValidators: true,
         })
             .populate('mesaId')
-            .populate('empleadoId');
+            .populate('empleadoId')
+            .populate('branchId');
 
         if (!order) {
             return res.status(404).json({
