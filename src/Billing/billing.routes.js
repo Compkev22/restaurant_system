@@ -4,13 +4,12 @@ import {
     getBillingById,
     createBilling,
     updateBilling,
-    changeBillingStatus
+    payBilling
 } from './billing.controller.js';
 
 import {
     validateCreateBilling,
     validateUpdateBillingRequest,
-    validateBillingStatusChange,
     validateGetBillingById
 } from '../../middlewares/billing-validator.js';
 
@@ -33,9 +32,8 @@ router.put(
 );
 
 router.put(
-    '/:id/status',
-    validateBillingStatusChange,
-    changeBillingStatus
+    '/:id/pay', 
+    payBilling
 );
 
 export default router;

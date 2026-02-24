@@ -12,7 +12,7 @@ const billingSchema = new mongoose.Schema({
         type: String,
         required: [true, 'La serie de la factura es requerida'],
         trim: true,
-        maxlength: [20, 'La serie de la factura no puede tener más de 20 caracteres'],
+        maxlength: [35, 'La serie de la factura no puede tener más de 35 caracteres'],
     },
     BillDate: {
         type: Date,
@@ -38,8 +38,8 @@ const billingSchema = new mongoose.Schema({
     },
     BillStatus: {
         type: String,
-        enum: ['ACTIVE', 'INACTIVE'],
-        default: 'ACTIVE'
+        enum: ['GENERATED', 'PAYED'],
+        default: 'GENERATED'
     }
 });
 

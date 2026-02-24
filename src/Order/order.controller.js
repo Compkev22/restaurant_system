@@ -2,6 +2,8 @@
 
 import Order from './order.model.js';
 import OrderDetail from '../OrderDetail/orderDetail.model.js';
+import Table from '../Table/table.model.js';
+
 
 export const getOrders = async (req, res) => {
     try {
@@ -79,21 +81,38 @@ export const getOrderById = async (req, res) => {
 export const createOrder = async (req, res) => {
     try {
         const { branchId, mesaId, empleadoId } = req.body;
+        const table = await Table.findById(mesaId);
+        if (!table) {
+            return res.status(404).json({
+                success: false,
+                message: 'Mesa no encontrada',
+            });
+        }
+        if (table.availability !== 'Disponible') {
+            return res.status(400).json({
+                success: false,
+                message: 'La mesa no está disponible',
+            });
+        }
 
         const order = await Order.create({
             branchId,
             mesaId,
             empleadoId,
             total: 0,
+            estado: 'Pendiente',
         });
+
+        table.availability = 'Ocupada';
+        await table.save();
 
         res.status(201).json({
             success: true,
-            message: 'Orden creada exitosamente',
+            message: 'Orden creada y mesa ocupada',
             data: order,
         });
     } catch (error) {
-        res.status(400).json({
+        res.status(500).json({
             success: false,
             message: 'Error al crear la orden',
             error: error.message,
