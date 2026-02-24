@@ -1,13 +1,25 @@
+// src/Branch/branch.routes.js
 'use strict';
 
 import { Router } from 'express';
-import { getBranches, createBranch, updateBranch, changeBranchStatus } from '../Branch/branch.controller.js';
-import { validateCreateBranch, validateUpdateBranch } from '../../middlewares/branch.validator.js';
+import {
+    createBranch,
+    getBranches,
+    updateBranch,
+    changeBranchStatus
+} from './branch.controller.js';
+
+import {
+    validateCreateBranch,
+    validateUpdateBranch,
+    validateBranchIdParam
+} from '../../middlewares/branch-validator.js'; 
 
 const router = Router();
 
-router.get('/', getBranches);
 router.post('/', validateCreateBranch, createBranch);
+router.get('/', getBranches);
 router.put('/:id', validateUpdateBranch, updateBranch);
-router.patch('/:id/status', changeBranchStatus);
+router.patch('/:id/status', validateBranchIdParam, changeBranchStatus);
+
 export default router;

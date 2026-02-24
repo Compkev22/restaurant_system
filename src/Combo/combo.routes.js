@@ -32,10 +32,11 @@ router.put(
     updateCombo
 );
 
-router.put(
+router.patch(
     '/:id/status',
     validateComboStatusChange,
     changeComboStatus
 );
+
 
 export default router;

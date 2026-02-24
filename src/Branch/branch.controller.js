@@ -4,15 +4,14 @@ import Branch from './branch.model.js';
 
 export const getBranches = async (req, res) => {
     try {
-        const { zona, BranchStatus } = req.query;
+        const { zone, branchStatus } = req.query;
         
         const filter = {};
-        // Filtro por defecto: solo sucursales activas
-        filter.BranchStatus = BranchStatus || 'ACTIVE';
+        filter.branchStatus = branchStatus || 'ACTIVE';
         
-        if (zona) filter.zona = parseInt(zona);
+        if (zone) filter.zone = parseInt(zone);
 
-        const branches = await Branch.find(filter).sort({ zona: 1, nombre: 1 });
+        const branches = await Branch.find(filter).sort({ zone: 1, name: 1 });
         
         res.status(200).json({ 
             success: true, 
@@ -44,7 +43,7 @@ export const updateBranch = async (req, res) => {
         if (!branch) {
             return res.status(404).json({ 
                 success: false, 
-                message: 'Sucursal no encontrada' 
+                message: 'Branch not found' 
             });
         }
 
@@ -62,25 +61,27 @@ export const changeBranchStatus = async (req, res) => {
         if (!branch) {
             return res.status(404).json({
                 success: false,
-                message: 'Sucursal no encontrada'
+                message: 'Branch not found'
             });
         }
 
-        // Lógica de Soft Delete
-        branch.BranchStatus = branch.BranchStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-        branch.deletedAt = branch.BranchStatus === 'INACTIVE' ? new Date() : null;
+        branch.branchStatus =
+            branch.branchStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+
+        branch.deletedAt =
+            branch.branchStatus === 'INACTIVE' ? new Date() : null;
 
         await branch.save();
 
         res.status(200).json({
             success: true,
-            message: `Sucursal ${branch.BranchStatus === 'ACTIVE' ? 'activada' : 'desactivada'} exitosamente`,
+            message: `Branch ${branch.branchStatus === 'ACTIVE' ? 'activated' : 'deactivated'} successfully`,
             data: branch
         });
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: 'Error al cambiar el estado de la sucursal',
+            message: 'Error changing branch status',
             error: error.message
         });
     }
