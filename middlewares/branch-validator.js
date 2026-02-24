@@ -5,52 +5,84 @@ import { checkValidators } from './check.validators.js';
 const branchStatuses = ['ACTIVE', 'INACTIVE'];
 
 export const validateCreateBranch = [
+
     body('name')
-        .notEmpty().withMessage('El nombre es obligatorio')
-        .isString().withMessage('El nombre debe ser un string'),
+        .notEmpty().withMessage('Name is required')
+        .isString().withMessage('Name must be a string'),
 
     body('address')
-        .notEmpty().withMessage('La dirección es obligatoria')
-        .isString().withMessage('La dirección debe ser un string'),
+        .notEmpty().withMessage('Address is required')
+        .isString().withMessage('Address must be a string'),
+
+    body('city')
+        .optional()
+        .isString().withMessage('City must be a string'),
+
+    body('zone')
+        .notEmpty().withMessage('Zone is required')
+        .isInt({ min: 1 }).withMessage('Zone must be a positive number'),
 
     body('phone')
-        .notEmpty().withMessage('El teléfono es obligatorio')
-        .isString().withMessage('El teléfono debe ser un string')
-        .isLength({ min: 8 }).withMessage('El teléfono debe tener al menos 8 caracteres'),
+        .notEmpty().withMessage('Phone is required')
+        .isNumeric().withMessage('Phone must be a number'),
 
-    body('status')
+    body('tableCapacity')
         .optional()
-        .isIn(branchStatuses).withMessage('status inválido'),
+        .isInt({ min: 0 }).withMessage('Table capacity must be 0 or greater'),
+
+    body('hasDriveThru')
+        .optional()
+        .isBoolean().withMessage('hasDriveThru must be boolean'),
+
+    body('branchStatus')
+        .optional()
+        .isIn(branchStatuses).withMessage('Invalid branchStatus'),
 
     checkValidators
 ];
 
 export const validateUpdateBranch = [
+
     param('id')
-        .isMongoId().withMessage('ID de sucursal inválido'),
+        .isMongoId().withMessage('Invalid branch ID'),
 
     body('name')
         .optional()
-        .isString().withMessage('El nombre debe ser un string'),
+        .isString().withMessage('Name must be a string'),
 
     body('address')
         .optional()
-        .isString().withMessage('La dirección debe ser un string'),
+        .isString().withMessage('Address must be a string'),
+
+    body('city')
+        .optional()
+        .isString().withMessage('City must be a string'),
+
+    body('zone')
+        .optional()
+        .isInt({ min: 1 }).withMessage('Zone must be a positive number'),
 
     body('phone')
         .optional()
-        .isString().withMessage('El teléfono debe ser un string')
-        .isLength({ min: 8 }).withMessage('El teléfono debe tener al menos 8 caracteres'),
+        .isNumeric().withMessage('Phone must be a number'),
 
-    body('status')
+    body('tableCapacity')
         .optional()
-        .isIn(branchStatuses).withMessage('status inválido'),
+        .isInt({ min: 0 }).withMessage('Table capacity must be 0 or greater'),
+
+    body('hasDriveThru')
+        .optional()
+        .isBoolean().withMessage('hasDriveThru must be boolean'),
+
+    body('branchStatus')
+        .optional()
+        .isIn(branchStatuses).withMessage('Invalid branchStatus'),
 
     checkValidators
 ];
 
 export const validateBranchIdParam = [
     param('id')
-        .isMongoId().withMessage('ID de sucursal inválido'),
+        .isMongoId().withMessage('Invalid branch ID'),
     checkValidators
 ];

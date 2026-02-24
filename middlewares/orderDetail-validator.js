@@ -31,9 +31,6 @@ export const validateCreateOrderDetail = [
         .notEmpty().withMessage('cantidad es obligatoria')
         .isInt({ min: 1 }).withMessage('cantidad debe ser mayor a 0'),
 
-    body('precio')
-        .notEmpty().withMessage('precio es obligatorio')
-        .isNumeric().withMessage('precio inválido'),
 
     checkValidators
 ];
@@ -46,9 +43,6 @@ export const validateUpdateOrderDetail = [
         .optional()
         .isInt({ min: 1 }).withMessage('cantidad inválida'),
 
-    body('precio')
-        .optional()
-        .isNumeric().withMessage('precio inválido'),
 
     checkValidators
 ];
