@@ -48,11 +48,11 @@ const routes = (app) => {
     app.use(`${BASE_URL}/reservations`, reservationRoutes);
     //app.use(`${BASE_URL}/sales`, saleRoutes);
     //app.use(`${BASE_URL}/employee`, employeeRoutes);
-    app.use(`${BASE_URL}/product`, productRoutes);
-    app.use(`${BASE_URL}/order`, orderRoutes);
-    app.use(`${BASE_URL}/orderDetail`, orderDetailRoutes);
-    app.use(`${BASE_URL}/branch`, branchRoutes);
-    app.use(`${BASE_URL}/billing`, billingRoutes);
+    app.use(`${BASE_URL}/products`, productRoutes);
+    app.use(`${BASE_URL}/orders`, orderRoutes);
+    app.use(`${BASE_URL}/orderDetails`, orderDetailRoutes);
+    app.use(`${BASE_URL}/branches`, branchRoutes);
+    app.use(`${BASE_URL}/billings`, billingRoutes);
     app.use(`${BASE_URL}/auth`, authRoutes);
 }
 
