@@ -1,6 +1,6 @@
 'use strict';
 import jwt from 'jsonwebtoken';
-import User from '../src/User/user.model';
+import User from '../src/User/user.model.js';
 
 export const validateJWT = async (req, res, next) => {
     const token = req.header('x-token') || req.header('Authorization')?.replace('Bearer ', '');
@@ -11,8 +11,9 @@ export const validateJWT = async (req, res, next) => {
         const { uid } = jwt.verify(token, process.env.SECRET_KEY);
         const user = await User.findById(uid);
 
-        if (!user || user.UserStatus === 'INACTIVE') {
-            return res.status(401).json({ message: 'Token no válido' });
+        // Verificamos si existe, si está activo y si no fue eliminado con el soft delete
+        if (!user || user.UserStatus === 'INACTIVE' || user.deletedAt) {
+            return res.status(401).json({ message: 'Token no válido - Usuario no disponible' });
         }
 
         req.user = user; // Guardamos al usuario en la req para usarlo después
