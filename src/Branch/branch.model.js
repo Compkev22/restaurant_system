@@ -3,48 +3,47 @@
 import mongoose from 'mongoose';
 
 const branchSchema = new mongoose.Schema({
-    branchId: {
-        type: Number,
-        required: true,
-        unique: true
-    },
-    nombre: {
+    name: {
         type: String,
         required: true,
         trim: true
     },
-    direccion: {
+    address: { 
         type: String,
         required: true
     },
-    municipio: {
+    city: {
         type: String,
         required: true,
         default: 'Guatemala'
     },
-    zona: {
+    zone: { 
         type: Number,
         required: true
     },
-    telefono: {
+    phone: {
         type: Number,
         required: true
     },
-    capacidadMesas: {
+    tableCapacity: { 
         type: Number,
         default: 0
-    },
-    tieneAutoservicio: {
+   },
+    hasDriveThru: {
         type: Boolean,
         default: true
     },
-    estado: {
+    branchStatus: { 
         type: String,
-        enum: ['Activa', 'Inactiva'],
-        default: 'Activa'
+        enum: ['ACTIVE', 'INACTIVE'],
+        default: 'ACTIVE'
+    },
+    deletedAt: {
+        type: Date,
+        default: null
     }
 }, { timestamps: true });
 
-branchSchema.index({ zona: 1, nombre: 1 });
+branchSchema.index({ zone: 1, name: 1 });
 
 export default mongoose.model('Branch', branchSchema);

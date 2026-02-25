@@ -1,15 +1,18 @@
+'use strict';
+
 import Billing from './billing.model.js';
+import Order from '../Order/order.model.js';
+import Table from '../Table/table.model.js';
 
 export const getBillings = async (req, res) => {
     try {
         const { page = 1, limit = 10, BillStatus } = req.query;
 
         const filter = {};
-        if (BillStatus) {
-            filter.BillStatus = BillStatus;
-        }
+        if (BillStatus) filter.BillStatus = BillStatus;
 
         const billings = await Billing.find(filter)
+            .populate('Order')
             .limit(parseInt(limit))
             .skip((parseInt(page) - 1) * parseInt(limit))
             .sort({ BillDate: -1 });
@@ -21,7 +24,7 @@ export const getBillings = async (req, res) => {
             data: billings,
             pagination: {
                 currentPage: parseInt(page),
-                totalPages: Math.ceil(total / parseInt(limit)),
+                totalPages: Math.ceil(total / limit),
                 totalRecords: total,
                 limit: parseInt(limit),
             },
@@ -39,7 +42,7 @@ export const getBillingById = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const billing = await Billing.findById(id);
+        const billing = await Billing.findById(id).populate('Order');
 
         if (!billing) {
             return res.status(404).json({
@@ -63,20 +66,40 @@ export const getBillingById = async (req, res) => {
 
 export const createBilling = async (req, res) => {
     try {
-        const billingData = req.body;
+        const { Order: orderId, BillPaymentMethod } = req.body;
 
-        if (billingData.BillDate || typeof billingData.BillDate === "object") {
-            billingData.BillDate = new Date();
-        } // Esto es para que si no se envia la fecha, se tome la fecha actual
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Orden no encontrada',
+            });
+        }
 
-        const billing = new Billing(billingData);
-        await billing.save();
+        const subtotal = order.total;
+        const iva = subtotal * 0.12;
+        const total = subtotal + iva;
+
+        const billSerie = `FACTURA-${Date.now()}`;
+
+        const billing = await Billing.create({
+            branchId: order.branchId,
+            Order: orderId,
+            BillSerie: billSerie,
+            BillSubtotal: subtotal,
+            BillIVA: iva,
+            BillTotal: total,
+            BillPaymentMethod,
+            BillStatus: 'GENERATED',
+            BillDate: new Date()
+        });
 
         res.status(201).json({
             success: true,
-            message: 'Factura creada exitosamente',
+            message: 'Factura generada exitosamente',
             data: billing,
         });
+
     } catch (error) {
         res.status(400).json({
             success: false,
@@ -116,33 +139,63 @@ export const updateBilling = async (req, res) => {
     }
 };
 
-export const changeBillingStatus = async (req, res) => {
+export const payBilling = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const billing = await Billing.findById(id);
-
-        if (!billing) {
+        const billing = await Billing.findById(id).populate('Order');
+        if (!billing || !billing.Order) {
             return res.status(404).json({
                 success: false,
-                message: 'Factura no encontrada',
+                message: 'Factura u orden no encontrada',
             });
         }
 
-        billing.BillStatus =
-            billing.BillStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+        if (billing.BillStatus === 'PAYED') {
+            return res.status(400).json({
+                success: false,
+                message: 'La factura ya fue pagada',
+            });
+        }
 
+        const order = await Order.findById(billing.Order._id);
+        if (!order) {
+            return res.status(404).json({
+                success: false,
+                message: 'Orden no encontrada',
+            });
+        }
+
+        if (order.estado !== 'Entregado') {
+            return res.status(400).json({
+                success: false,
+                message: 'La orden debe estar entregada para poder pagar',
+            });
+        }
+
+        const table = await Table.findById(order.mesaId);
+        if (table) {
+            table.availability = 'Disponible';
+            await table.save();
+        }
+
+        billing.BillStatus = 'PAYED';
         await billing.save();
 
         res.status(200).json({
             success: true,
-            message: `Factura ${billing.BillStatus === 'ACTIVE' ? 'activada' : 'desactivada'} exitosamente`,
-            data: billing,
+            message: 'Factura pagada y mesa liberada',
+            data: {
+                billing,
+                order,
+                table,
+            },
         });
+
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: 'Error al cambiar el estado de la factura',
+            message: 'Error al pagar la factura',
             error: error.message,
         });
     }

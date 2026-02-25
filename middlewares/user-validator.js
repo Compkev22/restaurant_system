@@ -2,13 +2,6 @@ import { body, param } from 'express-validator';
 import { checkValidators } from './check.validators.js';
 
 export const validateCreateUser = [
-    body('UserNIT')
-        .trim()
-        .notEmpty()
-        .withMessage('El NIT es requerido')
-        .isLength({ max: 20 })
-        .withMessage('El NIT no puede tener más de 20 caracteres'),
-
     body('UserName')
         .trim()
         .notEmpty()
@@ -41,12 +34,6 @@ export const validateUpdateUserRequest = [
     param('id')
         .isMongoId()
         .withMessage('ID debe ser un ObjectId'),
-
-    body('UserNIT')
-        .optional()
-        .trim()
-        .isLength({ max: 20 })
-        .withMessage('El NIT no puede tener más de 20 caracteres'),
 
     body('UserName')
         .optional()

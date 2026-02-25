@@ -41,8 +41,13 @@ const comboSchema = new mongoose.Schema({
         enum: ['ACTIVE', 'INACTIVE'],
         default: 'ACTIVE'
     },
+    deletedAt: {
+        type: Date,
+        default: null,
+        index: true
+    }
 }, { 
-    timestamps: true, // Reemplaza ComboCreatedAt y añade updatedAt
+    timestamps: true, 
     versionKey: false
 });
 

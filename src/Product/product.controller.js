@@ -6,11 +6,14 @@ import Inventory from '../Inventory/inventory.model.js';
 // Obtener productos
 export const getProducts = async (req, res) => {
     try {
-        const { page = 1, limit = 10, categoria, estado } = req.query;
+        const { page = 1, limit = 10, categoria, estado, ProductStatus } = req.query;
         const filter = {};
         
+        // Mantenemos los filtros originales y agregamos el de Soft Delete
         if (categoria) filter.categoria = categoria;
         if (estado) filter.estado = estado;
+        // Si no mandan un status específico, solo mostramos los ACTIVE
+        filter.ProductStatus = ProductStatus || 'ACTIVE';
 
         const products = await Product.find(filter)
             .populate('ingredientes.inventoryId', 'name stock unitCost')
@@ -39,6 +42,7 @@ export const createProduct = async (req, res) => {
         const data = req.body;
 
         // Valida que el arreglo de ingredientes exista
+
         if (!data.ingredientes || !Array.isArray(data.ingredientes) || data.ingredientes.length === 0) {
             return res.status(400).json({ 
                 success: false, 
@@ -47,6 +51,7 @@ export const createProduct = async (req, res) => {
         }
 
         // valida que cada ingrediente exista en la base de datos
+        
         for (const item of data.ingredientes) {
             const inventoryExists = await Inventory.findById(item.inventoryId);
             if (!inventoryExists) {
@@ -58,6 +63,7 @@ export const createProduct = async (req, res) => {
         }
 
         // Si Cloudinary subió el archivo, asignamos la URL segura al modelo
+        
         if (req.file) {
             data.imagen_url = req.file.path;
         }
@@ -77,6 +83,7 @@ export const updateProduct = async (req, res) => {
         const data = req.body;
 
         // valida que los nuevos ID existan en el inventario
+
         if (data.ingredientes && Array.isArray(data.ingredientes)) {
             for (const item of data.ingredientes) {
                 const inventoryExists = await Inventory.findById(item.inventoryId);
@@ -106,5 +113,31 @@ export const updateProduct = async (req, res) => {
         res.status(200).json({ success: true, data: updatedProduct });
     } catch (error) {
         res.status(400).json({ success: false, error: error.message });
+    }
+};
+
+// NUEVA FUNCIÓN PARA SOFT DELETE
+export const changeProductStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const product = await Product.findById(id);
+
+        if (!product) {
+            return res.status(404).json({ success: false, message: 'Producto no encontrado' });
+        }
+
+        // Alternar entre ACTIVE e INACTIVE
+        product.ProductStatus = product.ProductStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+        product.deletedAt = product.ProductStatus === 'INACTIVE' ? new Date() : null;
+
+        await product.save();
+
+        res.status(200).json({
+            success: true,
+            message: `El estado del producto ha cambiado a: ${product.ProductStatus}`,
+            data: product
+        });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
     }
 };

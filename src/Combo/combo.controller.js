@@ -1,23 +1,21 @@
 import Combo from './combo.model.js';
 import Product from '../Product/product.model.js';
 
+// Obtener combos (filtra ACTIVE por defecto)
 export const getCombos = async (req, res) => {
     try {
         const { page = 1, limit = 10, ComboStatus } = req.query;
 
-        const filter = {};
-        if (ComboStatus) {
-            filter.ComboStatus = ComboStatus;
-        }
+        const filter = { ComboStatus: ComboStatus || 'ACTIVE' };
 
         const combos = await Combo.find(filter)
             .populate({
-                    path: 'ComboList.productId',
-                    select: 'nombre precio categoria estado'
-                })
+                path: 'ComboList.productId',
+                select: 'nombre precio categoria estado'
+            })
             .limit(parseInt(limit))
             .skip((parseInt(page) - 1) * parseInt(limit))
-            .sort({ ComboCreatedAt: -1 });
+            .sort({ createdAt: -1 });
 
         const total = await Combo.countDocuments(filter);
 
@@ -31,6 +29,7 @@ export const getCombos = async (req, res) => {
                 limit: parseInt(limit),
             },
         });
+
     } catch (error) {
         res.status(500).json({
             success: false,
@@ -40,6 +39,7 @@ export const getCombos = async (req, res) => {
     }
 };
 
+// Obtener combo por ID 
 export const getComboById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -48,7 +48,7 @@ export const getComboById = async (req, res) => {
             path: 'ComboList.productId',
             select: 'nombre precio categoria imagen_url estado'
         });
-        
+
         if (!combo) {
             return res.status(404).json({
                 success: false,
@@ -60,6 +60,7 @@ export const getComboById = async (req, res) => {
             success: true,
             data: combo,
         });
+
     } catch (error) {
         res.status(500).json({
             success: false,
@@ -69,6 +70,7 @@ export const getComboById = async (req, res) => {
     }
 };
 
+// Crear combo
 export const createCombo = async (req, res) => {
     try {
         const comboData = req.body;
@@ -93,6 +95,7 @@ export const createCombo = async (req, res) => {
             message: 'Combo creado exitosamente',
             data: combo,
         });
+
     } catch (error) {
         res.status(400).json({
             success: false,
@@ -102,14 +105,14 @@ export const createCombo = async (req, res) => {
     }
 };
 
+// Actualizar combo
 export const updateCombo = async (req, res) => {
     try {
         const { id } = req.params;
         const data = req.body;
 
-        // Validar productos SOLO si vienen en el body para ser actualizados
-        if (data.ComboList && Array.isArray(data.ingredientes)) {
-            // Si el arreglo viene vacío, podrías lanzar un error dependiendo de tu regla de negocio
+        if (data.ComboList && Array.isArray(data.ComboList)) {
+
             if (data.ComboList.length === 0) {
                 return res.status(400).json({
                     success: false,
@@ -117,19 +120,17 @@ export const updateCombo = async (req, res) => {
                 });
             }
 
-            // Validar la existencia de cada nuevo producto en la lista
             for (const item of data.ComboList) {
                 const productExists = await Product.findById(item.productId);
                 if (!productExists) {
                     return res.status(404).json({
                         success: false,
-                        message: `El producto con ID ${item.productId} no existe. No se puede actualizar el combo.`
+                        message: `El producto con ID ${item.productId} no existe`
                     });
                 }
             }
         }
 
-        // runValidators valida los tipos de datos y enums del modelo
         const combo = await Combo.findByIdAndUpdate(id, data, {
             new: true,
             runValidators: true,
@@ -173,6 +174,9 @@ export const changeComboStatus = async (req, res) => {
         combo.ComboStatus =
             combo.ComboStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
 
+        combo.deletedAt =
+            combo.ComboStatus === 'INACTIVE' ? new Date() : null;
+
         await combo.save();
 
         res.status(200).json({
@@ -180,6 +184,7 @@ export const changeComboStatus = async (req, res) => {
             message: `Combo ${combo.ComboStatus === 'ACTIVE' ? 'activado' : 'desactivado'} exitosamente`,
             data: combo,
         });
+
     } catch (error) {
         res.status(500).json({
             success: false,

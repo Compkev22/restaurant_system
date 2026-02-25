@@ -1,6 +1,13 @@
+'use strict';
+
 import { Schema, model } from 'mongoose';
 
 const tableSchema = Schema({
+    branchId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Branch',
+        required: true
+    },
     numberTable: { 
         type: Number, 
         required: [true, 'El número de mesa es obligatorio'], 
@@ -10,11 +17,22 @@ const tableSchema = Schema({
         type: Number, 
         required: [true, 'La capacidad es obligatoria'] 
     },
-    status: { 
+    // Estandarizamos para el Soft Delete
+    TableStatus: { 
         type: String, 
-        enum: ['Disponible', 'Ocupada', 'Mantenimiento'], 
-        default: 'Disponible' 
+        enum: ['ACTIVE', 'INACTIVE'], 
+        default: 'ACTIVE' 
+    },
+    // Para uso de negocio (opcional, pero lo mantenemos si lo necesitas)
+    availability: {
+        type: String,
+        enum: ['Disponible', 'Ocupada', 'Mantenimiento'],
+        default: 'Disponible'
+    },
+    deletedAt: {
+        type: Date,
+        default: null
     }
-}, { versionKey: false });
+}, { versionKey: false, timestamps: true });
 
 export default model('Table', tableSchema);

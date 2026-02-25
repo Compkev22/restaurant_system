@@ -31,7 +31,7 @@ router.put(
     updateUser
 );
 
-router.put('/:id/status', validateUserStatusChange, changeUserStatus);
-
+// Cambio a PATCH según la instrucción de Milián
+router.patch('/:id/status', validateUserStatusChange, changeUserStatus);
 
 export default router;

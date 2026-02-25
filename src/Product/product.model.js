@@ -9,8 +9,8 @@ const productSchema = new mongoose.Schema({
             ref: 'Inventory',
             required: true
         },
-        cantidadUsada: { 
-            type: Number, 
+        cantidadUsada: {
+            type: Number,
             required: true,
             default: 1 // 1 pan, 2 lechugas, 2 carnes, etc....
         }
@@ -36,14 +36,24 @@ const productSchema = new mongoose.Schema({
         type: String,
         default: 'products/default-product.png'
     },
-    estado: {
+   estado: {
         type: String,
         enum: ['Disponible', 'Agotado', 'Descontinuado'],
         default: 'Disponible'
+    },
+    // agregamos el campo para el Soft Delete:
+    ProductStatus: {
+        type: String,
+        enum: ['ACTIVE', 'INACTIVE'],
+        default: 'ACTIVE'
+    },
+    deletedAt: {
+        type: Date,
+        default: null
     }
 }, { timestamps: true });
 
-// Índice para búsqueda por nombre y filtrado por categoría/estado
-productSchema.index({ nombre: 1, categoria: 1, inventoryId: 1 });
+// Actualiza el índice para incluir ProductStatus 
+productSchema.index({ nombre: 1, categoria: 1, ProductStatus: 1 });
 
 export default mongoose.model('Product', productSchema);

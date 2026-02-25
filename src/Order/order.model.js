@@ -1,25 +1,22 @@
 'use strict';
 
-import mongoose from 'mongoose';
+import { Schema, model } from 'mongoose';
 
-const orderSchema = new mongoose.Schema({
-    orderId: { // ID de la Orden
-        type: Number,
-        required: true,
-        unique: true
-    },
-    detallePedidoId: {
-        type: Number,
+const orderSchema = Schema({
+    branchId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Branch',
         required: true
     },
-    mesaId: { 
-        type: Number,
+    mesaId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Table',
         required: true
     },
     empleadoId: {
-        type: Number,
-        required: true,
-        ref: 'Employe'
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
     horaPedido: {
         type: Date,
@@ -29,10 +26,13 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ['Pendiente', 'En Preparacion', 'Listo', 'Entregado', 'Cancelado'],
         default: 'Pendiente'
+    },
+    total: {
+        type: Number,
+        default: 0
     }
-}, { timestamps: true });
+}, { versionKey: false, timestamps: true });
 
-// Índices para cocina y administración
 orderSchema.index({ estado: 1, horaPedido: 1 });
 
-export default mongoose.model('Order', orderSchema);
+export default model('Order', orderSchema);

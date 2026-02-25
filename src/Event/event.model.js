@@ -1,42 +1,66 @@
-'use strict';
+import { Schema, model } from 'mongoose';
 
-import mongoose, { Schema } from "mongoose";
-
-const eventSchema = new mongoose.Schema({
-    EventNumberOfPersons: {
-        type: String,
-        required: [true, 'El número de personas es requerido'],
-        trim: true,
-        maxlength: [20, 'El número de personas no puede tener más de 20 caracteres'],
-    },
-    EventNumberOfTables: {
-        type: String,
-        required: [true, 'El número de mesas es requerido'],
-        trim: true,
-        maxlength: [100, 'El número de mesas no puede tener más de 100 caracteres']
-    },
-    Combo: {
+const eventSchema = new Schema({
+    branchId: {
         type: Schema.Types.ObjectId,
-        ref: 'Combo',
-        required: [true, 'El combo es requerido'],
+        ref: 'Branch',
+        required: true
     },
-    EventTotal: {
-        type: Number,
-        required: [true, 'El total es requerido'],
-        trim: true,
-        lowercase: true,
+
+    clientId: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
-    EventStatus: {
+
+    name: {
         type: String,
-        enum: ['ACTIVE', 'INACTIVE'],
-        default: 'ACTIVE'
+        required: true,
+        trim: true
     },
-    EventCreatedAt: {
+
+    eventDate: {
         type: Date,
-        default: Date.now
+        required: true
+    },
+
+    startTime: {
+        type: String,
+        required: true
+    },
+
+    endTime: {
+        type: String,
+        required: true
+    },
+
+    numberOfPersons: {
+        type: Number,
+        required: true,
+        min: 1
+    },
+
+    tables: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Table'
+    }],
+
+    status: {
+        type: String,
+        enum: ['Pendiente', 'Confirmado', 'Cancelado', 'Finalizado'],
+        default: 'Pendiente'
+    },
+
+    notes: {
+        type: String,
+        trim: true
     }
+
+}, {
+    timestamps: true,
+    versionKey: false
 });
 
-eventSchema.index({ EventName: 1 });
+eventSchema.index({ branchId: 1, eventDate: 1 });
 
-export default mongoose.model("Event", eventSchema);
+export default model('Event', eventSchema);
