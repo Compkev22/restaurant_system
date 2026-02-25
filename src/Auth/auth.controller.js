@@ -1,4 +1,5 @@
 import User from '../User/user.model.js';
+import { generateJWT } from '../helpers/generate-jwt.js';
 
 // REGISTER (Crear cuenta)
 export const register = async (req, res) => {
@@ -34,21 +35,15 @@ export const login = async (req, res) => {
         // 2. Buscar si existe un usuario con ese correo
         const user = await User.findOne({ UserEmail });
 
-        // Si no existe el usuario
-        if (!user) {
-            return res.status(404).json({
-                success: false,
-                message: 'Credenciales inválidas: El correo no existe'
+        // Verificar usuario y contraseña (Bcrypt)
+        if (!user || !(await user.comparePassword(password))) {
+            return res.status(400).json({
+                message: 'Credenciales inválidas'
             });
         }
 
-        // 3. Verificar si la contraseña coincide (Comparación directa)
-        if (user.password !== password) {
-            return res.status(400).json({
-                success: false,
-                message: 'Credenciales inválidas: Contraseña incorrecta'
-            });
-        }
+        // Generar el token usando el helper
+        const token = await generateJWT(user._id, user.UserEmail, user.role);
 
         // 4. Si todo coincide, responder con éxito
         res.status(200).json({
