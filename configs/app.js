@@ -30,6 +30,7 @@ import branchRoutes from '../src/Branch/branch.routes.js';
 import billingRoutes from '../src/Billing/billing.routes.js';
 import authRoutes from '../src/Auth/auth.routes.js';
 import orderRequestRoutes from '../src/OrderRequest/orderRequest.routes.js'
+import reviewRoutes from '../src/Review/review.routes.js'
 
 const middleware = (app) => {
     app.use(helmet(helmetConfiguration));
@@ -57,6 +58,7 @@ const routes = (app) => {
     app.use(`${BASE_URL}/billings`, billingRoutes);
     app.use(`${BASE_URL}/auth`, authRoutes);
     app.use(`${BASE_URL}/orderRequests`, orderRequestRoutes);
+    app.use(`${BASE_URL}/reviews`, reviewRoutes);
 
 }
 
