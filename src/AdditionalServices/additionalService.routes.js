@@ -12,24 +12,29 @@ import {
     validateAdditionalServiceStatusChange
 } from '../../middlewares/additionalService-validator.js';
 
+import { validateJWT } from '../../middlewares/validate-jwt.js';
+
 const router = Router();
 
-router.get('/', getAdditionalServices);
+router.get('/', validateJWT, getAdditionalServices);
 
 router.post(
     '/',
+    validateJWT,
     validateCreateAdditionalService,
     createAdditionalService
 );
 
 router.put(
     '/:id',
+    validateJWT,
     validateUpdateAdditionalService,
     updateAdditionalService
 );
 
 router.patch(
     '/:id/status',
+    validateJWT,
     validateAdditionalServiceStatusChange,
     changeAdditionalServiceStatus
 );

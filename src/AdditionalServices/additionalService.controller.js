@@ -2,14 +2,18 @@
 
 import AdditionalService from './additionalService.model.js';
 
+//Todos
 export const getAdditionalServices = async (req, res) => {
     try {
         const { page = 1, limit = 10, status } = req.query;
 
         const filter = {};
-        if (status) {
-            filter.status = status;
+        if (req.user.role === 'CLIENT') {
+            filter.status = 'ACTIVE';
+        } else if (req.query.status) {
+            filter.status = req.query.status;
         }
+
 
         const services = await AdditionalService.find(filter)
             .limit(parseInt(limit))
@@ -38,8 +42,13 @@ export const getAdditionalServices = async (req, res) => {
     }
 };
 
+//Solo PLATFORM_ADMIN y BRANCH_ADMIN
 export const createAdditionalService = async (req, res) => {
     try {
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN'].includes(req.user.role)) {
+            return res.status(403).json({ success: false, message: 'No autorizado' });
+        }
+
         const service = new AdditionalService(req.body);
         await service.save();
 
@@ -58,8 +67,13 @@ export const createAdditionalService = async (req, res) => {
     }
 };
 
+// PLATFORM_ADMIN y BRANCH_ADMIN
 export const updateAdditionalService = async (req, res) => {
     try {
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN'].includes(req.user.role)) {
+            return res.status(403).json({ success: false, message: 'No autorizado' });
+        }
+
         const { id } = req.params;
 
         const service = await AdditionalService.findByIdAndUpdate(
@@ -93,8 +107,13 @@ export const updateAdditionalService = async (req, res) => {
     }
 };
 
+//PLATFORM_ADMIN, BRANCH_ADMIN  Y EMPLOYEE
 export const changeAdditionalServiceStatus = async (req, res) => {
     try {
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN', 'EMPLOYEE'].includes(req.user.role)) {
+            return res.status(403).json({ success: false, message: 'No autorizado' });
+        }
+
         const { id } = req.params;
         const service = await AdditionalService.findById(id);
 
