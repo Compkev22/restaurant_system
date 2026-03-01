@@ -1,22 +1,22 @@
 'use strict';
 
-import { Schema, mongoose } from 'mongoose';
+import { Schema, model } from 'mongoose';
 
-const orderSchema = new Schema({
+const orderSchema = Schema({
     branchId: {
         type: Schema.Types.ObjectId, 
         ref: 'Branch',
         required: true
     },
     mesaId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Table',
         required: true
     },
     empleadoId: {
-        type: Schema.Types.ObjectId, 
-        required: true,
-        ref: 'User'
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
     },
     horaPedido: {
         type: Date,
