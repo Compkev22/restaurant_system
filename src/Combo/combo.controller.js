@@ -145,7 +145,7 @@ export const updateCombo = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: 'Combo actualizado exitosamente',
+            message: 'Combo actualizado y validado exitosamente',
             data: combo,
         });
 

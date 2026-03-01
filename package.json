@@ -1,15 +1,16 @@
 {
   "name": "restaurant_system",
   "version": "1.0.0",
-  "type": "module", 
-  "description": "", 
+  "type": "module",
+  "description": "",
   "main": "index.js",
-"scripts": {
+  "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js"
   },
   "dependencies": {
     "axios": "^1.13.5",
+    "bcrypt": "^6.0.0",
     "cloudinary": "^1.41.3",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
@@ -22,6 +23,7 @@
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
     "multer-storage-cloudinary": "^4.0.0",
+    "nodemailer": "^8.0.1",
     "uuid": "^13.0.0"
   }
 }
