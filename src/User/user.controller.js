@@ -1,151 +1,203 @@
-import User from './user.model.js';
+'use strict';
 
-// Obtener todos los usuarios (Filtra activos por defecto)
+import User from './user.model.js';
+import { generateJWT } from '../../helpers/generate-jwt.js';
+
+/* OBTENER USUARIOS*/
 export const getUsers = async (req, res) => {
     try {
-        const { page = 1, limit = 10, UserStatus } = req.query;
 
-        // Soft Delete: Filtramos por ACTIVE 
-        const filter = { UserStatus: UserStatus || 'ACTIVE' };
+        const { role, UserStatus } = req.query;
 
-        const users = await User.find(filter)
-            .limit(parseInt(limit))
-            .skip((parseInt(page) - 1) * parseInt(limit))
-            .sort({ UserCreatedAt: -1 });
+        const filter = {};
 
-        const total = await User.countDocuments(filter);
+        if (role) filter.role = role;
+        if (UserStatus) filter.UserStatus = UserStatus;
+
+        const users = await User.find(filter).select('-password');
 
         res.status(200).json({
             success: true,
-            data: users,
-            pagination: {
-                currentPage: parseInt(page),
-                totalPages: Math.ceil(total / limit),
-                totalRecords: total,
-                limit: parseInt(limit),
-            },
+            data: users
         });
+
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: 'Error al obtener los usuarios',
-            error: error.message,
+            message: 'Error al obtener usuarios',
+            error: error.message
         });
     }
 };
 
-// Obtener un usuario por ID (Sin alterar el estado)
+/* OBTENER USUARIO POR ID*/
 export const getUserById = async (req, res) => {
     try {
+
         const { id } = req.params;
 
-        const user = await User.findById(id);
+        const user = await User.findById(id).select('-password');
 
         if (!user) {
             return res.status(404).json({
                 success: false,
-                message: 'Usuario no encontrado',
+                message: 'Usuario no encontrado'
             });
         }
 
         res.status(200).json({
             success: true,
-            data: user,
+            data: user
         });
+
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: 'Error al obtener el usuario',
-            error: error.message,
+            message: 'Error al obtener usuario',
+            error: error.message
         });
     }
 };
 
-// Crear usuario
+/* CREAR USUARIO*/
 export const createUser = async (req, res) => {
     try {
-        const userData = req.body;
 
-        const user = new User(userData);
+        const creator = req.user; 
+        let { role, ...data } = req.body;
+
+        if (!creator) {
+            return res.status(401).json({
+                message: 'No autenticado'
+            });
+        }
+
+        /* ===== CONTROL DE ROLES ===== */
+        switch (creator.role) {
+
+            case 'PLATFORM_ADMIN':
+                break;
+
+            case 'BRANCH_ADMIN':
+                //Solo puede crear Empleado y Cliente
+                if (role === 'PLATFORM_ADMIN' || role === 'BRANCH_ADMIN') {
+                    return res.status(403).json({
+                        message: 'No puede crear administradores'
+                    });
+                }
+                break;
+
+            default:
+                return res.status(403).json({
+                    message: 'No tiene permisos para crear usuarios'
+                });
+        }
+
+        const user = new User({
+            ...data,
+            role
+        });
+
         await user.save();
 
         res.status(201).json({
             success: true,
-            message: 'Usuario creado exitosamente',
-            data: user,
+            message: 'Usuario creado correctamente',
+            data: user
         });
+
     } catch (error) {
         res.status(400).json({
             success: false,
-            message: 'Error al crear el usuario',
-            error: error.message,
+            message: 'Error al crear usuario',
+            error: error.message
         });
     }
 };
 
-// Actualizar datos del usuario
+/* ACTUALIZAR USUARIO*/
 export const updateUser = async (req, res) => {
     try {
-        const { id } = req.params;
 
-        const user = await User.findByIdAndUpdate(id, req.body, {
-            new: true,
-            runValidators: true,
-        });
+        const { id } = req.params;
+        const updates = req.body;
+
+        delete updates.password;
+        delete updates.role;
+
+        const user = await User.findByIdAndUpdate(
+            id,
+            updates,
+            { new: true }
+        ).select('-password');
 
         if (!user) {
             return res.status(404).json({
-                success: false,
-                message: 'Usuario no encontrado',
+                message: 'Usuario no encontrado'
             });
         }
 
         res.status(200).json({
             success: true,
-            message: 'Usuario actualizado exitosamente',
-            data: user,
+            message: 'Usuario actualizado',
+            data: user
         });
+
     } catch (error) {
         res.status(400).json({
             success: false,
-            message: 'Error al actualizar el usuario',
-            error: error.message,
+            message: 'Error actualizando usuario',
+            error: error.message
         });
     }
 };
 
-// Soft Delete 
+/* CAMBIO DE ESTADO (SOFT DELETE)*/
 export const changeUserStatus = async (req, res) => {
     try {
+
         const { id } = req.params;
 
         const user = await User.findById(id);
 
         if (!user) {
             return res.status(404).json({
-                success: false,
-                message: 'Usuario no encontrado',
+                message: 'Usuario no encontrado'
             });
         }
 
-        // Cambio de estado 
-        user.UserStatus = user.UserStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
-        
-        // Manejo de la fecha de Soft Delete
-        user.deletedAt = user.UserStatus === 'INACTIVE' ? new Date() : null;
+        user.UserStatus =
+            user.UserStatus === 'ACTIVE'
+                ? 'INACTIVE'
+                : 'ACTIVE';
+
+        user.deletedAt =
+            user.UserStatus === 'INACTIVE'
+                ? new Date()
+                : null;
 
         await user.save();
 
         res.status(200).json({
             success: true,
-            message: `Usuario ${user.UserStatus === 'ACTIVE' ? 'activado' : 'desactivado'} exitosamente`,
-            data: user,
+            message: `Usuario ${user.UserStatus}`,
+            data: user
         });
+
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: 'Error al cambiar el estado del usuario',
-            error: error.message,
+            message: 'Error cambiando estado',
+            error: error.message
         });
     }
+};
+
+/* PERFIL DEL USUARIO LOGUEADO*/
+export const getProfile = async (req, res) => {
+
+    res.status(200).json({
+        success: true,
+        user: req.user
+    });
 };

@@ -1,13 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-event-validator
->>>>>>> 3a710b3 (T69/ Implementar Soft Delete a la entidad Branch)
-=======
->>>>>>> e448b61 (T70/ Finalizar configuraciones y limpieza de rutas tras implementar Soft Delete)
-=======
->>>>>>> 56c4fa8b78772b8bfd5c3e027ea1d24870d420d5
 import { body, param } from 'express-validator';
 import { checkValidators } from './check.validators.js';
 
