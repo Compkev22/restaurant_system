@@ -10,18 +10,22 @@ import {
 } from './orderRequest.controller.js';
 
 import { validateJWT } from '../../middlewares/validate-jwt.js';
-import { hasRole } from '../../middlewares/role-validator.js'
+import { hasRole } from '../../middlewares/role-validator.js';
+import {
+    validateCreateOrderRequest,
+    validateUpdateOrderRequestStatus
+} from '../../middlewares/orderRequest-validator.js';
 
 const router = Router();
 
-/**
- * CLIENTES
- */
+//---------------------------------------------------
+// CLIENTES
 // Crear pedido
 router.post(
     '/',
     validateJWT,
-    hasRole('CLIENT'),
+    hasRole('CLIENT', 'EMPLOYEE'), // CLIENT para PICKUP/DELIVERY, EMPLOYEE para LOCAL
+    validateCreateOrderRequest,
     createOrderRequest
 );
 // Ver mis pedidos
@@ -38,10 +42,9 @@ router.put(
     hasRole('CLIENT'),
     cancelOrderRequest
 );
+// ----------------------------------------------
+// PERSONAL RESTAURANTE
 
-/**
- * PERSONAL RESTAURANTE
- */
 // Ver pedidos por sucursal
 router.get(
     '/branch/:branchId',
@@ -49,11 +52,13 @@ router.get(
     hasRole('EMPLOYEE', 'BRANCH_ADMIN', 'PLATFORM_ADMIN'),
     getBranchOrderRequests
 );
-// Cambiar estado
+// Cambiar estado del pedido
 router.put(
     '/status/:id',
     validateJWT,
     hasRole('EMPLOYEE', 'BRANCH_ADMIN'),
+    validateUpdateOrderRequestStatus,
     updateOrderRequestStatus
 );
+
 export default router;
