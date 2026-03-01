@@ -3,6 +3,13 @@
 import mongoose from 'mongoose';
 
 const productSchema = new mongoose.Schema({
+    Branches: [{
+        BranchId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Branch',
+            required: true
+        }
+    }],
     ingredientes: [{
         inventoryId: {
             type: mongoose.Schema.Types.ObjectId,
@@ -36,7 +43,7 @@ const productSchema = new mongoose.Schema({
         type: String,
         default: 'products/default-product.png'
     },
-   estado: {
+    estado: {
         type: String,
         enum: ['Disponible', 'Agotado', 'Descontinuado'],
         default: 'Disponible'

@@ -1,6 +1,6 @@
 'use strict';
 
-import mongoose from 'mongoose';
+import mongoose, { trusted } from 'mongoose';
 
 const branchSchema = new mongoose.Schema({
     name: {
@@ -8,7 +8,7 @@ const branchSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    address: { 
+    address: {
         type: String,
         required: true
     },
@@ -17,7 +17,7 @@ const branchSchema = new mongoose.Schema({
         required: true,
         default: 'Guatemala'
     },
-    zone: { 
+    zone: {
         type: Number,
         required: true
     },
@@ -25,19 +25,49 @@ const branchSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    tableCapacity: { 
+    Email: {
+        type: String,
+        required: true
+    },
+    tableCapacity: {
         type: Number,
         default: 0
-   },
+    },
+    Category: {
+        type: String,
+        enum: ['Gourmet', 'Buffet', 'Fast Food', 'Familiar'],
+        required: true
+    },
     hasDriveThru: {
         type: Boolean,
         default: true
     },
-    branchStatus: { 
+    AveragePrices: {
+        type: Number,
+        default: 0.00,
+        required: true
+    },
+    OpenedAt: {
+        type: String,
+        default: '06:00',
+        required: true
+    },
+    ClosedAt: {
+        type: String,
+        default: '18:00',
+        required: true
+    },
+    branchStatus: {
         type: String,
         enum: ['ACTIVE', 'INACTIVE'],
         default: 'ACTIVE'
     },
+    Photos: [{
+        ImgaeURL: {
+            type: String,
+            default: 'branches/restaurant_generic'
+        }
+    }],
     deletedAt: {
         type: Date,
         default: null
