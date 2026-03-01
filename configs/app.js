@@ -29,6 +29,7 @@ import orderDetailRoutes from '../src/OrderDetail/orderDetail.routes.js';
 import branchRoutes from '../src/Branch/branch.routes.js';
 import billingRoutes from '../src/Billing/billing.routes.js';
 import authRoutes from '../src/Auth/auth.routes.js';
+import additionalServices from '../src/AdditionalServices/additionalService.routes.js';
 
 const middleware = (app) => {
     app.use(helmet(helmetConfiguration));
@@ -45,7 +46,7 @@ const routes = (app) => {
     app.use(`${BASE_URL}/events`, eventRoutes);
     app.use(`${BASE_URL}/inventory`, inventoryRoutes);
     app.use(`${BASE_URL}/menu`, menuRoutes);
-    app.use(`${BASE_URL}/tables`, tableRoutes); 
+    app.use(`${BASE_URL}/tables`, tableRoutes);
     app.use(`${BASE_URL}/reservations`, reservationRoutes);
     //app.use(`${BASE_URL}/sales`, saleRoutes);
     //app.use(`${BASE_URL}/employee`, employeeRoutes);
@@ -55,6 +56,7 @@ const routes = (app) => {
     app.use(`${BASE_URL}/branches`, branchRoutes);
     app.use(`${BASE_URL}/billings`, billingRoutes);
     app.use(`${BASE_URL}/auth`, authRoutes);
+    app.use(`${BASE_URL}/AS`, additionalServices);
 }
 
 const initServer = async () => {
