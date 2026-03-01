@@ -8,15 +8,25 @@ const orderSchema = Schema({
         ref: 'Branch',
         required: true
     },
-    mesaId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Table',
+    orderType: {
+        type: String,
+        enum: ["DINE_IN", "TAKEAWAY", "DELIVERY"],
         required: true
     },
+
     empleadoId: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
+        ref: "User",
+        required: function () {
+            return this.orderType === "DINE_IN";
+        }
+    },
+    mesaId: {
+        type: Schema.Types.ObjectId,
+        ref: "Table",
+        required: function () {
+            return this.orderType === "DINE_IN";
+        }
     },
     horaPedido: {
         type: Date,

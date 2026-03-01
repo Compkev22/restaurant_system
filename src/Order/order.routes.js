@@ -14,15 +14,47 @@ import {
     validateUpdateStatus
 } from '../../middlewares/order.validator.js';
 
+import { validateJWT } from '../../middlewares/validate-jwt.js';
+import { hasRole } from '../../middlewares/role-validator.js';
+
 const router = Router();
 
+/* 
+   RUTAS PÚBLICAS / CONSULTA
+*/
 router.get('/', getOrders);
 router.get('/:id', getOrderById);
 
-router.post('/', validateCreateOrder, createOrder);
+/* 
+   CREAR ORDEN (DINE_IN SOLO EMPLEADO)
+*/
+router.post(
+    '/',
+    validateJWT,           // primero autenticación
+    hasRole('EMPLOYEE'),    // solo empleados pueden crear
+    validateCreateOrder,    // valida datos del body
+    createOrder             // controller crea la orden
+);
 
-router.put('/:id', updateOrder);
+/*
+   ACTUALIZAR ORDEN
+*/
+router.put(
+    '/:id',
+    validateJWT,
+    hasRole('EMPLOYEE'), // solo personal autorizado puede actualizar
+    updateOrder
+);
 
-router.patch('/:id/status', validateUpdateStatus, changeOrderStatus);
+/* 
+   CAMBIAR ESTADO
+*/
+router.patch(
+    '/:id/status',
+    validateJWT,
+    hasRole('EMPLOYEE', 'BRANCH_ADMIN'), // roles permitidos
+    validateUpdateStatus,
+    changeOrderStatus
+);
 
 export default router;
