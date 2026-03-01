@@ -13,7 +13,7 @@ export const saveReservation = async (req, res) => {
 
 export const getReservations = async (req, res) => {
     try {
-        const reservations = await Reservation.find().populate('table', 'numberTable');
+        const reservations = await Reservation.find()
         return res.send({ success: true, reservations });
     } catch (err) {
         return res.status(500).send({ success: false, message: 'Error al obtener', error: err.message });
