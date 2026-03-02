@@ -32,6 +32,7 @@ import authRoutes from '../src/Auth/auth.routes.js';
 import orderRequestRoutes from '../src/OrderRequest/orderRequest.routes.js'
 import reviewRoutes from '../src/Review/review.routes.js'
 import additionalServices from '../src/AdditionalServices/additionalService.routes.js';
+import couponRoutes from '../src/Coupon/coupon.routes.js'
 
 const middleware = (app) => {
     app.use(helmet(helmetConfiguration));
@@ -60,8 +61,10 @@ const routes = (app) => {
     app.use(`${BASE_URL}/auth`, authRoutes);
     app.use(`${BASE_URL}/orderRequests`, orderRequestRoutes);
     app.use(`${BASE_URL}/reviews`, reviewRoutes);
-
     app.use(`${BASE_URL}/AS`, additionalServices);
+    app.use(`${BASE_URL}/coupons`, couponRoutes);
+
+
 }
 
 const initServer = async () => {

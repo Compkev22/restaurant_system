@@ -26,6 +26,17 @@ const orderRequestSchema = new mongoose.Schema({
         enum: ['TAKEAWAY', 'DELIVERY'],
         required: true
     },
+    couponCode: {
+        type: String,
+        uppercase: true,
+        trim: true,
+        default: null
+    },
+    appliedCoupon: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Coupon'
+    }
+    ,
     orderStatus: {
             type: String,
             enum: [

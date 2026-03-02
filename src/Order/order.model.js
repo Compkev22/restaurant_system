@@ -13,7 +13,6 @@ const orderSchema = Schema({
         enum: ["DINE_IN", "TAKEAWAY", "DELIVERY"],
         required: true
     },
-
     empleadoId: {
         type: Schema.Types.ObjectId,
         ref: "User",
@@ -27,6 +26,15 @@ const orderSchema = Schema({
         required: function () {
             return this.orderType === "DINE_IN";
         }
+    },
+    coupon: {
+        type: Schema.Types.ObjectId,
+        ref: 'Coupon',
+        default: null
+    },
+    discountApplied: {
+        type: Number,
+        default: 0
     },
     horaPedido: {
         type: Date,

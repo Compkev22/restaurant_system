@@ -3,6 +3,7 @@
 import Order from './order.model.js';
 import OrderDetail from '../OrderDetail/orderDetail.model.js';
 import Table from '../Table/table.model.js';
+import Coupon from '../Coupon/coupon.model.js';
 
 // Obtener todas las Ordenes
 export const getOrders = async (req, res) => {
@@ -115,7 +116,7 @@ export const createOrder = async (req, res) => {
         // SOLO clientes crean DELIVERY o PICKUP
         if (
             (orderType === 'DELIVERY' || orderType === 'PICKUP') &&
-            userRole !== 'CUSTOMER'
+            userRole !== 'CLIENT'
         ) {
             return res.status(403).json({
                 success: false,
@@ -152,15 +153,46 @@ export const createOrder = async (req, res) => {
             }
         }
 
-        // creación de la Orden
+        const { couponCode } = req.body; 
+        let appliedCouponId = null;
+
+        if (couponCode) {
+            // Importar Coupon arriba en el archivo es mejor: import Coupon from '../Coupon/coupon.model.js';
+            const couponDB = await Coupon.findOne({ 
+                code: couponCode.toUpperCase(), 
+                status: 'ACTIVE' 
+            });
+
+            if (!couponDB) {
+                return res.status(404).json({ success: false, message: 'Cupón no válido o inexistente' });
+            }
+
+            if (new Date() > couponDB.expirationDate) {
+                return res.status(400).json({ success: false, message: 'El cupón ha expirado' });
+            }
+
+            if (couponDB.usedCount >= couponDB.usageLimit) {
+                return res.status(400).json({ success: false, message: 'El cupón ha alcanzado su límite de usos' });
+            }
+
+            appliedCouponId = couponDB._id;
+            // Nota: El descuento real se aplicará cuando se calculen los OrderDetails
+        }
+
         const order = await Order.create({
             branchId,
             mesaId: orderType === 'DINE_IN' ? mesaId : null,
             empleadoId,
             orderType,
+            coupon: appliedCouponId,
             total: 0,
             estado: 'Pendiente'
         });
+
+        // IMPORTANTE: Incrementar el uso del cupón si se aplicó
+        if (appliedCouponId) {
+            await Coupon.findByIdAndUpdate(appliedCouponId, { $inc: { usedCount: 1 } });
+        }
 
         // Ocupar Mesa
         if (table) {
