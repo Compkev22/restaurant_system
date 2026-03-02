@@ -1,15 +1,20 @@
-'use strict';
-
 import Coupon from './coupon.model.js';
 
-/**
- * Crear un nuevo cupón
- */
 export const createCoupon = async (req, res) => {
     try {
         const { code, discountPercentage, expirationDate, usageLimit } = req.body;
+        const upperCode = code.toUpperCase(); 
 
-        // Validar que la fecha no sea en el pasado
+        // 1. Validar si ya existe un cupón con ese código
+        const existing = await Coupon.findOne({ code: upperCode });
+        if (existing) {
+            return res.status(400).json({
+                success: false,
+                message: `El código de cupón '${upperCode}' ya está registrado`
+            });
+        }
+
+        // 2. Validar que la fecha no sea en el pasado
         if (new Date(expirationDate) < new Date()) {
             return res.status(400).json({
                 success: false,
@@ -18,7 +23,7 @@ export const createCoupon = async (req, res) => {
         }
 
         const newCoupon = await Coupon.create({
-            code,
+            code: upperCode,
             discountPercentage,
             expirationDate,
             usageLimit
@@ -59,6 +64,10 @@ export const getCoupons = async (req, res) => {
 export const updateCoupon = async (req, res) => {
     try {
         const { id } = req.params;
+        
+        // Si el body trae un código, lo pasamos a mayúsculas antes de actualizar
+        if (req.body.code) req.body.code = req.body.code.toUpperCase();
+
         const updatedCoupon = await Coupon.findByIdAndUpdate(id, req.body, { 
             new: true, 
             runValidators: true 
@@ -79,12 +88,12 @@ export const updateCoupon = async (req, res) => {
 };
 
 /**
- * Eliminar (o desactivar) cupón
+ * Desactivar cupón (Borrado lógico)
  */
 export const deleteCoupon = async (req, res) => {
     try {
         const { id } = req.params;
-        // En lugar de borrar, lo pasamos a INACTIVE por historial
+        // Cambiamos a INACTIVE para que el validador de órdenes ya no lo reconozca
         const coupon = await Coupon.findByIdAndUpdate(id, { status: 'INACTIVE' }, { new: true });
 
         if (!coupon) {
@@ -93,7 +102,8 @@ export const deleteCoupon = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: 'Cupó desactivado exitosamente'
+            message: 'Cupón desactivado exitosamente (Ahora es INACTIVE)',
+            data: coupon
         });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });

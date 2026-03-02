@@ -9,16 +9,27 @@ import {
 } from './coupon.controller.js';
 import { validateJWT } from '../../middlewares/validate-jwt.js';
 import { hasRole } from '../../middlewares/role-validator.js';
+import { createCouponValidator } from '../../middlewares/coupon-validator.js';
 
 const router = Router();
 
-// Middleware global para todas las rutas de este archivo
+// Middleware global: Autenticación y Rol
 router.use(validateJWT);
-router.use(hasRole('PLATFORM_ADMIN'));
+router.use(hasRole('PLATFORM_ADMIN')); 
 
-router.post('/', createCoupon);
+
+// POST - Crear 
+router.post('/', [createCouponValidator], createCoupon);
+
+// GET - Listar
 router.get('/', getCoupons);
+
+// PUT - Actualizar datos generales
 router.put('/:id', updateCoupon);
-router.delete('/:id', deleteCoupon);
+
+/**
+ * PATCH - Borrado Lógico o Desactivación
+ */
+router.patch('/:id', deleteCoupon);
 
 export default router;

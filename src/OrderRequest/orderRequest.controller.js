@@ -168,9 +168,11 @@ export const createOrderRequest = async (req, res) => {
             branch,
             order: order._id,
             orderType,
+            couponCode: couponCode ? couponCode.toUpperCase() : null, 
+            appliedCoupon: appliedCouponId, 
             deliveryAddress: orderType === 'DELIVERY' ? deliveryAddress : undefined,
             orderStatus: 'Pendiente',
-            total: totalConDescuento // El total del request debe ser el total final
+            total: totalConDescuento // El total ya tiene el descuento aplicado
         });
 
         res.status(201).json({
