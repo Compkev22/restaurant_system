@@ -90,8 +90,9 @@ export const createOrder = async (req, res) => {
         } = req.body;
 
         const userRole = req.user.role;
-        const empleadoId =
-            userRole === 'EMPLOYEE' ? req.user._id : null;
+        const empleadoId = ['EMPLOYEE', 'BRANCH_ADMIN', 'PLATFORM_ADMIN'].includes(userRole) 
+            ? req.user._id 
+            : null;
 
         //Validar tipo de Orden
         if (!orderType) {
@@ -105,11 +106,10 @@ export const createOrder = async (req, res) => {
            RBAC — REGLAS DE NEGOCIO
         =============================== */
 
-        // SOLO empleados crean DINE_IN
-        if (orderType === 'DINE_IN' && userRole !== 'EMPLOYEE') {
+        if (orderType === 'DINE_IN' && !['EMPLOYEE', 'BRANCH_ADMIN', 'PLATFORM_ADMIN'].includes(userRole)) {
             return res.status(403).json({
                 success: false,
-                message: 'Solo empleados pueden crear órdenes DINE_IN'
+                message: 'No tienes permisos para crear órdenes en mesa'
             });
         }
 
@@ -219,6 +219,14 @@ export const createOrder = async (req, res) => {
 export const updateOrder = async (req, res) => {
     try {
         const { id } = req.params;
+        const userRole = req.user.role;
+
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN', 'EMPLOYEE'].includes(userRole)) {
+            return res.status(403).json({
+                success: false,
+                message: 'No autorizado para editar órdenes'
+            });
+        }
 
         const order = await Order.findByIdAndUpdate(
             id,

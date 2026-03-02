@@ -3,6 +3,7 @@
 import Billing from './billing.model.js';
 import Order from '../Order/order.model.js';
 import Table from '../Table/table.model.js';
+import User from '../User/user.model.js';
 import OrderRequest from '../OrderRequest/orderRequest.model.js';
 
 /**
@@ -76,28 +77,58 @@ export const getBillingById = async (req, res) => {
  */
 export const createBilling = async (req, res) => {
     try {
-        const { Order: orderId, BillPaymentMethod, BillSerie } = req.body;
-        const clientId = req.user._id; // Obtenemos el cliente del token
+        const { 
+            Order: orderId, 
+            BillPaymentMethod, 
+            BillSerie,
+            clientId,        
+            newClientData   
+        } = req.body;
 
         const order = await Order.findById(orderId);
-        if (!order) {
-            return res.status(404).json({ success: false, message: 'Orden no encontrada' });
-        }
+        if (!order) return res.status(404).json({ success: false, message: 'Orden no encontrada' });
 
         // Evitar duplicados
         const existing = await Billing.findOne({ Order: orderId });
         if (existing) return res.status(400).json({ success: false, message: 'Esta orden ya fue facturada' });
 
-        // Lógica de IVA desglosado (Si el total ya incluye IVA)
+        let finalClientId = clientId;
+
+        // Lógica para determinar el cliente
+        if (!clientId && newClientData) {
+            // Caso: Crear cliente nuevo desde la factura
+            const userExists = await User.findOne({ UserEmail: newClientData.UserEmail.toLowerCase() });
+            
+            if (userExists) {
+                finalClientId = userExists._id;
+            } else {
+                // Crear usuario rápido (puedes ponerle una password genérica o vacía)
+                const newUser = await User.create({
+                    ...newClientData,
+                    password: 'Password123!', // Password por defecto o aleatoria
+                    role: 'CLIENT'
+                });
+                finalClientId = newUser._id;
+            }
+        }
+
+        if (!finalClientId) {
+            return res.status(400).json({ 
+                success: false, 
+                message: 'Debe proporcionar un clientId o datos para crear uno (newClientData)' 
+            });
+        }
+
+        // Cálculos de IVA
         const total = order.total;
         const subtotal = total / 1.12;
         const iva = total - subtotal;
 
         const billing = await Billing.create({
             branchId: order.branchId,
-            client: clientId, // <--- Referencia al modelo nuevo
+            client: finalClientId,
             Order: orderId,
-            BillSerie: BillSerie || `FACT-${Date.now()}`,
+            BillSerie: BillSerie || `FAC-${Date.now()}`,
             BillSubtotal: subtotal.toFixed(2),
             BillIVA: iva.toFixed(2),
             BillTotal: total.toFixed(2),
@@ -108,7 +139,7 @@ export const createBilling = async (req, res) => {
 
         res.status(201).json({
             success: true,
-            message: 'Factura generada exitosamente',
+            message: 'Factura generada y cliente asignado',
             data: billing,
         });
 
@@ -147,7 +178,7 @@ export const payBilling = async (req, res) => {
         await billing.save();
 
         if (order) {
-            order.estado = 'Finalizada';
+            order.estado = 'Entregado';
             await order.save();
             
             // Sincronizar con OrderRequest si aplica
@@ -156,7 +187,7 @@ export const payBilling = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: 'Factura pagada, mesa liberada y orden finalizada',
+            message: 'Factura pagada, mesa liberada y orden entregada',
             data: billing
         });
 

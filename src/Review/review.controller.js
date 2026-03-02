@@ -2,70 +2,71 @@
 
 import Review from './review.model.js';
 import Order from '../Order/order.model.js';
+import OrderRequest from '../OrderRequest/orderRequest.model.js';
 
 /* -----------------------------------------
    CREAR RESEÑA
 ------------------------------------------*/
 export const createReview = async (req, res) => {
     try {
-        const { orderId, rating, comment } = req.body;
-        const customer = req.user._id;
+        const { orderRequestId, rating, comment } = req.body;
+        const customerId = req.user._id;
 
-        const order = await Order.findById(orderId);
+        // BUSCAR el pedido (No crearlo)
+        const orderReq = await OrderRequest.findById(orderRequestId);
 
-        if (!order) {
+        if (!orderReq) {
             return res.status(404).json({
                 success: false,
-                message: 'Orden no encontrada'
+                message: 'Solicitud de pedido no encontrada'
             });
         }
 
-        // 🔐 Validar que la orden pertenece al cliente
-        if (order.customer.toString() !== customer.toString()) {
+        // Validar dueño
+        if (orderReq.customer.toString() !== customerId.toString()) {
             return res.status(403).json({
                 success: false,
-                message: 'No puedes reseñar una orden que no es tuya'
+                message: 'No puedes reseñar un pedido que no realizaste tú'
             });
         }
 
-        if (order.estado !== 'Entregado') {
+        // Validar estado
+        if (orderReq.orderStatus !== 'Entregado') {
             return res.status(400).json({
                 success: false,
-                message: 'Solo se pueden reseñar órdenes entregadas'
+                message: 'Solo puedes reseñar pedidos entregados'
             });
         }
 
+        // CREAR la RESEÑA (Aquí es donde se usa Review.create)
         const review = await Review.create({
-            customer,
-            order: orderId,
-            branch: order.branchId,
+            customer: customerId,
+            order: orderReq.order, 
+            branch: orderReq.branch,
             rating,
             comment
         });
 
         res.status(201).json({
             success: true,
-            message: 'Reseña creada',
+            message: 'Reseña creada exitosamente',
             data: review
         });
 
     } catch (error) {
-
         if (error.code === 11000) {
             return res.status(400).json({
                 success: false,
-                message: 'Ya has dejado una reseña para esta orden'
+                message: 'Ya has dejado una reseña para este pedido'
             });
         }
-
         res.status(500).json({
             success: false,
-            message: 'Error al crear reseña',
+            message: 'Error al procesar la reseña',
             error: error.message
         });
     }
 };
-
 
 /* -----------------------------------------
    OBTENER RESEÑAS DEL CLIENTE
@@ -172,12 +173,11 @@ export const updateReview = async (req, res) => {
 export const deleteReview = async (req, res) => {
     try {
         const { id } = req.params;
+        const userRole = req.user.role;
+        const userId = req.user._id;
 
-        const review = await Review.findOne({
-            _id: id,
-            customer: req.user._id,
-            isDeleted: false
-        });
+        // Buscamos la reseña
+        const review = await Review.findById(id);
 
         if (!review) {
             return res.status(404).json({
@@ -186,18 +186,38 @@ export const deleteReview = async (req, res) => {
             });
         }
 
-        review.isDeleted = true;
+        // Lógica de Permisos 
+        const isPlatformAdmin = userRole === 'PLATFORM_ADMIN';
+        const isBranchAdmin = (userRole === 'BRANCH_ADMIN' && review.branch?.toString() === req.user.branchId?.toString());
+        const isOwner = review.customer.toString() === userId.toString();
+
+        if (!isPlatformAdmin && !isBranchAdmin && !isOwner) {
+            return res.status(403).json({
+                success: false,
+                message: 'No tienes permiso para modificar el estado de esta reseña'
+            });
+        }
+
+        review.isDeleted = !review.isDeleted;
+        
         await review.save();
+
+        // 4. Respuesta dinámica según el nuevo estado
+        const statusMessage = review.isDeleted ? 'eliminada (Soft Delete)' : 'restaurada con éxito';
 
         res.status(200).json({
             success: true,
-            message: 'Reseña eliminada correctamente'
+            message: `Reseña ${statusMessage} por ${userRole}`,
+            data: {
+                id: review._id,
+                isDeleted: review.isDeleted
+            }
         });
 
     } catch (error) {
         res.status(500).json({
             success: false,
-            message: 'Error al eliminar reseña',
+            message: 'Error al procesar el cambio de estado de la reseña',
             error: error.message
         });
     }

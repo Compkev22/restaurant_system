@@ -31,7 +31,7 @@ router.get('/:id', getOrderById);
 router.post(
     '/',
     validateJWT,           // primero autenticación
-    hasRole('EMPLOYEE'),    // solo empleados pueden crear
+    hasRole('EMPLOYEE','BRANCH_ADMIN',"PLATFORM_ADMIN"),    // solo empleados pueden crear
     validateCreateOrder,    // valida datos del body
     createOrder             // controller crea la orden
 );
@@ -42,7 +42,7 @@ router.post(
 router.put(
     '/:id',
     validateJWT,
-    hasRole('EMPLOYEE'), // solo personal autorizado puede actualizar
+    hasRole('EMPLOYEE','BRANCH_ADMIN',"PLATFORM_ADMIN"), // solo personal autorizado puede actualizar
     updateOrder
 );
 
@@ -52,7 +52,7 @@ router.put(
 router.patch(
     '/:id/status',
     validateJWT,
-    hasRole('EMPLOYEE', 'BRANCH_ADMIN'), // roles permitidos
+    hasRole('EMPLOYEE', 'BRANCH_ADMIN',"PLATFORM_ADMIN"), // roles permitidos
     validateUpdateStatus,
     changeOrderStatus
 );

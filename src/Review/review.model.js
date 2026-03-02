@@ -38,10 +38,9 @@ const reviewSchema = new mongoose.Schema({
     }
 });
 
-// Un cliente solo puede dejar una reseña por orden (no eliminada)
-reviewSchema.index(
-    { customer: 1, order: 1 },
-    { unique: true }
-);
+// Índice único para evitar duplicados
+reviewSchema.index({ customer: 1, order: 1 }, { unique: true });
 
-export default mongoose.model('Review', reviewSchema);
+// EXPORTACIÓN CORRECTA PARA REVIEW
+const Review = mongoose.models.Review || mongoose.model('Review', reviewSchema);
+export default Review;

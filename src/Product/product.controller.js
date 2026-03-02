@@ -6,7 +6,7 @@ import Branch from '../Branch/branch.model.js';
 import mongoose from 'mongoose';
 
 //Actualizar promedio de precio por sucursal
-const updateBranchAverage = async (branchId) => {
+const updatedBranchAverage = async (branchId) => {
 
     const result = await Product.aggregate([
         {
@@ -104,7 +104,7 @@ export const createProduct = async (req, res) => {
         const product = new Product(data);
         await product.save();
         for (const branch of product.Branches) {
-            await updateBranchAverage(branch.BranchId);
+            await updatedBranchAverage(branch.BranchId);
         }
 
         res.status(201).json({ success: true, data: product });
@@ -113,7 +113,7 @@ export const createProduct = async (req, res) => {
     }
 };
 
-export const updateProduct = async (req, res) => {
+export const updatedProduct = async (req, res) => {
     try {
         if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN'].includes(req.user.role)) {
             return res.status(403).json({ success: false, message: 'No autorizado' });
@@ -150,8 +150,8 @@ export const updateProduct = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Producto no encontrado' });
         }
 
-        for (const branch of updateProduct.Branches) {
-            await updateBranchAverage(branch.BranchId);
+        for (const branch of updatedProduct.Branches) {
+            await updatedBranchAverage(branch.BranchId);
         }
 
         res.status(200).json({ success: true, data: updatedProduct });
@@ -181,7 +181,7 @@ export const changeProductStatus = async (req, res) => {
         await product.save();
 
         for (const branch of product.Branches) {
-            await updateBranchAverage(branch.BranchId);
+            await updatedBranchAverage(branch.BranchId);
         }
 
         res.status(200).json({

@@ -24,6 +24,15 @@ const router = Router();
    CLIENTES
 ========================================= */
 
+// Soft Delete (PATCH)
+router.patch(
+    '/:id/status',
+    validateJWT,
+    hasRole('CLIENT','BRANCH_ADMIN', 'PLATFORM_ADMIN'),
+    validateDeleteReview,
+    deleteReview
+);
+
 // Crear reseña
 router.post(
     '/',
@@ -50,14 +59,7 @@ router.put(
     updateReview
 );
 
-// Soft Delete (PATCH)
-router.patch(
-    '/:id/delete',
-    validateJWT,
-    hasRole('CLIENT'),
-    validateDeleteReview,
-    deleteReview
-);
+
 
 
 /* =========================================

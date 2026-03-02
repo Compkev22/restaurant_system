@@ -30,6 +30,6 @@ router.put('/:id', updateCoupon);
 /**
  * PATCH - Borrado Lógico o Desactivación
  */
-router.patch('/:id', deleteCoupon);
+router.patch('/:id/status', deleteCoupon);
 
 export default router;

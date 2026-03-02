@@ -3,23 +3,31 @@ import Combo from '../Combo/combo.model.js';
 
 export const getMenu = async (req, res) => {
     try {
-        const products = await Product.find({ status: 'Disponible' });
+        const products = await Product.find({ 
+            estado: 'Disponible', 
+            ProductStatus: 'ACTIVE' 
+        });
 
-        const combos = await Combo.find({ status: 'Disponible' });
+        const combos = await Combo.find({ 
+            status: 'Disponible',
+            ComboStatus: 'ACTIVE' 
+        });
 
         const menu = [
             ...products.map(product => ({
                 _id: product._id,
-                name: product.name,
-                description: product.description,
-                price: product.price,
+                name: product.nombre,   
+                description: product.descripcion || 'Sin descripción', 
+                category: product.categoria,
+                price: product.precio,  
                 type: 'Individual'
             })),
             ...combos.map(combo => ({
                 _id: combo._id,
-                name: combo.name,
-                description: combo.description,
-                price: combo.price,
+                name: combo.ComboName,              
+                description: combo.ComboDescription, 
+                price: combo.ComboPrice,            
+                category: 'Combos',
                 type: 'Combo'
             }))
         ];

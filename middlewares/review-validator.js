@@ -17,10 +17,6 @@ const MAX_RATING = 5;
 
 export const validateCreateReview = [
 
-    body('orderId')
-        .notEmpty().withMessage('orderId es obligatorio')
-        .isMongoId().withMessage('orderId inválido'),
-
     body('rating')
         .notEmpty().withMessage('rating es obligatorio')
         .isInt({ min: MIN_RATING, max: MAX_RATING })

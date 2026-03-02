@@ -7,12 +7,11 @@ import { checkValidators } from './check.validators.js';
 const allowedOrderTypes = ['TAKEAWAY', 'DELIVERY'];
 
 const allowedStatuses = [
-    'CREATED',
-    'CONFIRMED',
-    'PREPARING',
-    'READY',
-    'DELIVERED',
-    'CANCELLED'
+    'Pendiente',
+    'En Preparacion',
+    'Listo',
+    'Entregado',
+    'Cancelado'
 ];
 
 /**
@@ -34,7 +33,7 @@ export const validateCreateOrderRequest = [
     body().custom((body, { req }) => {
 
         // Solo clientes pueden crear OrderRequest
-        if (req.user?.role !== 'CLIENT') {
+        if (req.user?.role !== 'CLIENT' && req.user?.role !== 'PLATFORM_ADMIN') {
             throw new Error('Solo clientes pueden crear un OrderRequest');
         }
 

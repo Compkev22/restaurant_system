@@ -22,6 +22,15 @@ const inventorySchema = Schema({
     unitCost: {
         type: Number,
         required: [true, 'El costo unitario es obligatorio']
+    },
+    status: {
+        type: String,
+        enum: ['ACTIVE', 'INACTIVE'],
+        default: 'ACTIVE'
+    },
+    deletedAt: {
+        type: Date,
+        default: null
     }
 }, { versionKey: false });
 

@@ -22,6 +22,11 @@ const comboSchema = new mongoose.Schema({
             min: [1, 'La cantidad mínima es 1']
         }
     }],
+    status: {
+        type: String,
+        enum: ['Disponible', 'Agotado', 'Descontinuado'],
+        default: 'Disponible'
+    },
     ComboDescription: {
         type: String,
         required: [true, 'La descripción es requerida'],

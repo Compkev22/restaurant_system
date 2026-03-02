@@ -177,7 +177,7 @@ export const createOrderRequest = async (req, res) => {
 
         res.status(201).json({
             success: true,
-            message: 'Pedido solicitado correctamente con descuento aplicado',
+            message: 'Pedido solicitado correctamente',
             data: orderRequest
         });
 

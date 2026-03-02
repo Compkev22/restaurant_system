@@ -43,19 +43,38 @@ export const updateInventory = async (req, res) => {
         return res.status(500).send({ success: false, message: 'Error al actualizar', err: err.message });
     }
 };
-// ELIMINAR un insumo
+// ELIMINAR un insumo (Soft Delete)
 export const deleteInventory = async (req, res) => {
     try {
         if (req.user.role !== 'PLATFORM_ADMIN') {
             return res.status(403).send({ success: false, message: 'No autorizado' });
         }
+        
         const { id } = req.params;
-        const deletedItem = await Inventory.findByIdAndDelete(id);
+        const item = await Inventory.findById(id);
 
-        if (!deletedItem) return res.status(404).send({ success: false, message: 'Insumo no encontrado' });
+        if (!item) return res.status(404).send({ success: false, message: 'Insumo no encontrado' });
 
-        return res.send({ success: true, message: 'Insumo eliminado físicamente' });
+        // LÓGICA REVERSIBLE:
+        // Si es ACTIVE lo pasamos a INACTIVE, si es INACTIVE lo pasamos a ACTIVE
+        const newStatus = item.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+        const deletionDate = newStatus === 'INACTIVE' ? new Date() : null;
+
+        const updatedItem = await Inventory.findByIdAndUpdate(
+            id, 
+            { 
+                status: newStatus, 
+                deletedAt: deletionDate 
+            }, 
+            { new: true }
+        );
+
+        return res.send({ 
+            success: true, 
+            message: `Insumo marcado como ${newStatus}`,
+            updatedItem 
+        });
     } catch (err) {
-        return res.status(500).send({ success: false, message: 'Error al eliminar', err: err.message });
+        return res.status(500).send({ success: false, message: 'Error', err: err.message });
     }
 };

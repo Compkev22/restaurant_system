@@ -21,9 +21,9 @@ router.get('/', validateJWT, getBillings);
 router.get('/:id', validateJWT, getBillingById);
 
 // Crear factura (Solo clientes o empleados)
-router.post('/', [validateJWT, hasRole('BRANCH_ADMIN', 'EMPLOYEE')], createBilling);
+router.post('/', [validateJWT, hasRole('BRANCH_ADMIN', 'EMPLOYEE', 'PLATFORM_ADMIN')], createBilling);
 
 // Pagar y finalizar ciclo (Solo empleados/admin usualmente procesan el pago)
-router.patch('/pay/:id', [validateJWT, hasRole('EMPLOYEE', 'BRANCH_ADMIN')], payBilling);
+router.patch('/pay/:id', [validateJWT, hasRole('EMPLOYEE', 'BRANCH_ADMIN','PLATFORM_ADMIN')], payBilling);
 
 export default router;

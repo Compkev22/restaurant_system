@@ -24,7 +24,7 @@ const router = Router();
 router.post(
     '/',
     validateJWT,
-    hasRole('CLIENT', 'EMPLOYEE'), // CLIENT para PICKUP/DELIVERY, EMPLOYEE para LOCAL
+    hasRole('CLIENT', 'EMPLOYEE','PLATFORM_ADMIN'), // CLIENT para PICKUP/DELIVERY, EMPLOYEE para LOCAL
     validateCreateOrderRequest,
     createOrderRequest
 );
@@ -54,9 +54,9 @@ router.get(
 );
 // Cambiar estado del pedido
 router.put(
-    '/status/:id',
+    '/:id',
     validateJWT,
-    hasRole('EMPLOYEE', 'BRANCH_ADMIN'),
+    hasRole('EMPLOYEE', 'BRANCH_ADMIN','PLATFORM_ADMIN'),
     validateUpdateOrderRequestStatus,
     updateOrderRequestStatus
 );

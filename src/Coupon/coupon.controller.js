@@ -93,19 +93,38 @@ export const updateCoupon = async (req, res) => {
 export const deleteCoupon = async (req, res) => {
     try {
         const { id } = req.params;
-        // Cambiamos a INACTIVE para que el validador de órdenes ya no lo reconozca
-        const coupon = await Coupon.findByIdAndUpdate(id, { status: 'INACTIVE' }, { new: true });
+
+        // 1. Buscamos el cupón primero para conocer su estado actual
+        const coupon = await Coupon.findById(id);
 
         if (!coupon) {
-            return res.status(404).json({ success: false, message: 'Cupón no encontrado' });
+            return res.status(404).json({ 
+                success: false, 
+                message: 'Cupón no encontrado' 
+            });
         }
+
+        // 2. Lógica de Toggle: Si es ACTIVE pasa a INACTIVE y viceversa
+        const newStatus = coupon.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+        
+        // 3. Aplicamos el cambio
+        coupon.status = newStatus;
+        await coupon.save();
+
+        // 4. Mensaje dinámico según la acción realizada
+        const actionMessage = newStatus === 'ACTIVE' ? 'activado' : 'desactivado';
 
         res.status(200).json({
             success: true,
-            message: 'Cupón desactivado exitosamente (Ahora es INACTIVE)',
+            message: `Cupón ${actionMessage} exitosamente`,
             data: coupon
         });
+
     } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+        res.status(500).json({ 
+            success: false, 
+            message: 'Error al procesar el cambio de estado del cupón',
+            error: error.message 
+        });
     }
 };
