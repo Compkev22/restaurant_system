@@ -40,7 +40,9 @@ export const getProducts = async (req, res) => {
         if (categoria) filter.categoria = categoria;
         if (estado) filter.estado = estado;
         // Si no mandan un status específico, solo mostramos los ACTIVE
-        filter.ProductStatus = ProductStatus || 'ACTIVE';
+        if (req.user.role === 'CLIENT') {
+            filter.ProductStatus = 'ACTIVE';
+        }
 
         const products = await Product.find(filter)
             .populate('ingredientes.inventoryId', 'name stock unitCost')
@@ -66,6 +68,10 @@ export const getProducts = async (req, res) => {
 
 export const createProduct = async (req, res) => {
     try {
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN'].includes(req.user.role)) {
+            return res.status(403).json({ success: false, message: 'No autorizado' });
+        }
+
         const data = req.body;
 
         // Valida que el arreglo de ingredientes exista
@@ -109,6 +115,10 @@ export const createProduct = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
     try {
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN'].includes(req.user.role)) {
+            return res.status(403).json({ success: false, message: 'No autorizado' });
+        }
+
         const { id } = req.params;
         const data = req.body;
 
@@ -153,6 +163,10 @@ export const updateProduct = async (req, res) => {
 // NUEVA FUNCIÓN PARA SOFT DELETE
 export const changeProductStatus = async (req, res) => {
     try {
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN'].includes(req.user.role)) {
+            return res.status(403).json({ success: false, message: 'No autorizado' });
+        }
+
         const { id } = req.params;
         const product = await Product.findById(id);
 

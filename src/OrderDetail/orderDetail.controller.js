@@ -8,6 +8,10 @@ import Inventory from '../Inventory/inventory.model.js';
 
 export const createOrderDetail = async (req, res) => {
     try {
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN', 'EMPLOYEE'].includes(req.user.role)) {
+            return res.status(403).json({ success: false, message: 'No autorizado' });
+        }
+
         const { order, productoId, comboId, cantidad } = req.body;
 
         const existingOrder = await Order.findById(order);
@@ -98,6 +102,15 @@ export const getOrderDetailsByOrder = async (req, res) => {
     try {
         const { orderId } = req.params;
 
+        if (req.user.role === 'CLIENT') {
+            if (order.clientId?.toString() !== req.user._id.toString()) {
+                return res.status(403).json({ success: false, message: 'No autorizado' });
+            }
+        } else if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN', 'EMPLOYEE'].includes(req.user.role)) {
+            return res.status(403).json({ success: false, message: 'No autorizado' });
+        }
+
+
         const details = await OrderDetail.find({ order: orderId })
             .populate('productoId')
             .populate('comboId')
@@ -120,6 +133,10 @@ export const getOrderDetailsByOrder = async (req, res) => {
 
 export const updateOrderDetail = async (req, res) => {
     try {
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN', 'EMPLOYEE'].includes(req.user.role)) {
+            return res.status(403).json({ success: false, message: 'No autorizado' });
+        }
+
         const { id } = req.params;
 
         const detail = await OrderDetail.findById(id);
@@ -166,6 +183,10 @@ export const updateOrderDetail = async (req, res) => {
  */
 export const deleteOrderDetail = async (req, res) => {
     try {
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN', 'EMPLOYEE'].includes(req.user.role)) {
+            return res.status(403).json({ success: false, message: 'No autorizado' });
+        }
+        
         const { id } = req.params;
 
         const detail = await OrderDetail.findById(id);

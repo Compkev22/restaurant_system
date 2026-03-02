@@ -1,11 +1,11 @@
 'use strict';
 
 import { Router } from 'express';
-import { 
-    getBillings, 
-    getBillingById, 
-    createBilling, 
-    payBilling 
+import {
+    getBillings,
+    getBillingById,
+    createBilling,
+    payBilling
 } from './billing.controller.js';
 import { validateJWT } from '../../middlewares/validate-jwt.js';
 import { hasRole } from '../../middlewares/role-validator.js';
@@ -21,7 +21,7 @@ router.get('/', validateJWT, getBillings);
 router.get('/:id', validateJWT, getBillingById);
 
 // Crear factura (Solo clientes o empleados)
-router.post('/', [validateJWT, hasRole('CLIENT', 'EMPLOYEE')], createBilling);
+router.post('/', [validateJWT, hasRole('BRANCH_ADMIN', 'EMPLOYEE')], createBilling);
 
 // Pagar y finalizar ciclo (Solo empleados/admin usualmente procesan el pago)
 router.patch('/pay/:id', [validateJWT, hasRole('EMPLOYEE', 'BRANCH_ADMIN')], payBilling);

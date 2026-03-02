@@ -15,11 +15,14 @@ import {
     validateOrderDetailIdParam
 } from '../../middlewares/orderDetail-validator.js';
 
+import { validateJWT } from '../../middlewares/validate-jwt.js';
+
 const router = Router();
 
 // Crear item de orden
 router.post(
     '/',
+    validateJWT,
     validateCreateOrderDetail,
     createOrderDetail
 );
@@ -27,6 +30,7 @@ router.post(
 // Obtener items por orden
 router.get(
     '/order/:orderId',
+    validateJWT,
     validateOrderIdParam,
     getOrderDetailsByOrder
 );
@@ -34,6 +38,7 @@ router.get(
 // Actualizar item
 router.put(
     '/:id',
+    validateJWT,
     validateUpdateOrderDetail,
     updateOrderDetail
 );
@@ -41,6 +46,7 @@ router.put(
 // Eliminar item
 router.delete(
     '/:id',
+    validateJWT,
     validateOrderDetailIdParam,
     deleteOrderDetail
 );
