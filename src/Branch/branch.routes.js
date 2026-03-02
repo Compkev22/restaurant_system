@@ -13,13 +13,17 @@ import {
     validateCreateBranch,
     validateUpdateBranch,
     validateBranchIdParam
-} from '../../middlewares/branch-validator.js'; 
+} from '../../middlewares/branch-validator.js';
+
+import { uploadBranchImage } from '../../middlewares/file-uploader.js';
+
+import { validateJWT } from '../../middlewares/validate-jwt.js';
 
 const router = Router();
 
-router.post('/', validateCreateBranch, createBranch);
-router.get('/', getBranches);
-router.put('/:id', validateUpdateBranch, updateBranch);
-router.patch('/:id/status', validateBranchIdParam, changeBranchStatus);
+router.post('/', validateJWT, uploadBranchImage.single('Photos'), validateCreateBranch, createBranch);
+router.get('/', validateJWT, getBranches);
+router.put('/:id', validateJWT, uploadBranchImage.single('Photos'), validateUpdateBranch, updateBranch);
+router.patch('/:id/status', validateJWT, validateBranchIdParam, changeBranchStatus);
 
 export default router;

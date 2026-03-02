@@ -1,39 +1,29 @@
-import { Router } from 'express';
-import {
-    getBillings,
-    getBillingById,
-    createBilling,
-    updateBilling,
-    payBilling
-} from './billing.controller.js';
+'use strict';
 
-import {
-    validateCreateBilling,
-    validateUpdateBillingRequest,
-    validateGetBillingById
-} from '../../middlewares/billing-validator.js';
+import { Router } from 'express';
+import { 
+    getBillings, 
+    getBillingById, 
+    createBilling, 
+    payBilling 
+} from './billing.controller.js';
+import { validateJWT } from '../../middlewares/validate-jwt.js';
+import { hasRole } from '../../middlewares/role-validator.js';
 
 const router = Router();
 
-router.get('/', getBillings);
+// --- RUTAS PROTEGIDAS POR JWT ---
 
-router.get('/:id', validateGetBillingById, getBillingById);
+// Obtener todas las facturas (Admin/Empleado ve todas, Customer solo las suyas)
+router.get('/', validateJWT, getBillings);
 
-router.post(
-    '/',
-    validateCreateBilling,
-    createBilling
-);
+// Obtener una factura específica
+router.get('/:id', validateJWT, getBillingById);
 
-router.put(
-    '/:id',
-    validateUpdateBillingRequest,
-    updateBilling
-);
+// Crear factura (Solo clientes o empleados)
+router.post('/', [validateJWT, hasRole('CLIENT', 'EMPLOYEE')], createBilling);
 
-router.put(
-    '/:id/pay', 
-    payBilling
-);
+// Pagar y finalizar ciclo (Solo empleados/admin usualmente procesan el pago)
+router.patch('/pay/:id', [validateJWT, hasRole('EMPLOYEE', 'BRANCH_ADMIN')], payBilling);
 
 export default router;

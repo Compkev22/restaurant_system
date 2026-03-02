@@ -8,6 +8,11 @@ const billingSchema = new mongoose.Schema({
         ref: 'Branch',
         required: true
     },
+    client: { 
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: [true, 'El cliente es obligatorio para la factura']
+    },
     BillSerie: {
         type: String,
         required: [true, 'La serie de la factura es requerida'],
@@ -34,15 +39,19 @@ const billingSchema = new mongoose.Schema({
     },
     BillPaymentMethod: {
         type: String,
-        enum: ['CASH', 'CARD']
+        enum: ['CASH', 'CARD'],
+        required: true
     },
     BillStatus: {
         type: String,
         enum: ['GENERATED', 'PAYED'],
         default: 'GENERATED'
     }
+}, { 
+    versionKey: false, 
+    timestamps: true 
 });
 
-billingSchema.index({ BillSerie: 1 });
+billingSchema.index({ BillSerie: 1, client: 1 });
 
 export default mongoose.model("Billing", billingSchema);

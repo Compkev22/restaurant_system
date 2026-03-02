@@ -19,6 +19,14 @@ const eventSchema = new Schema({
         trim: true
     },
 
+    additionalServices: [{
+        additionalServiceId: {
+            type: Schema.Types.ObjectId,
+            ref: 'AdditionalService',
+            required: false
+        }
+    }],
+
     eventDate: {
         type: Date,
         required: true
