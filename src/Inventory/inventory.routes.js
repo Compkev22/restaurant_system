@@ -6,11 +6,12 @@ import {
     deleteInventory
 } from './inventory.controller.js';
 import { inventoryValidator } from '../../middlewares/inventory-validator.js';
+import { validateJWT } from '../../middlewares/validate-jwt.js';
 const api = Router();
 
-api.post('/', inventoryValidator, saveInventory);
-api.get('/', getInventory);
+api.post('/', validateJWT, inventoryValidator, saveInventory);
+api.get('/', validateJWT, getInventory);
 // Vamos a usar el estándar: solo el ID para editar y eliminar
-api.put('/:id', inventoryValidator, updateInventory);
-api.delete('/:id', deleteInventory);
+api.put('/:id', validateJWT, inventoryValidator, updateInventory);
+api.delete('/:id', validateJWT, deleteInventory);
 export default api;

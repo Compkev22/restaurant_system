@@ -6,12 +6,24 @@ import { generateJWT } from '../../helpers/generate-jwt.js';
 /* OBTENER USUARIOS*/
 export const getUsers = async (req, res) => {
     try {
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN'].includes(req.user.role)) {
+            return res.status(403).json({ success: false, message: 'No autorizado' });
+        }
+
 
         const { role, UserStatus } = req.query;
 
         const filter = {};
+        if (req.user.role === 'BRANCH_ADMIN') {
+            filter.role = { $in: ['EMPLOYEE', 'CLIENT'] };
+            if (role && !['EMPLOYEE', 'CLIENT'].includes(role)) {
+                return res.status(403).json({ success: false, message: 'No puede ver administradores' });
+            }
+            if (role) filter.role = role;
+        } else {
+            if (role) filter.role = role;
+        }
 
-        if (role) filter.role = role;
         if (UserStatus) filter.UserStatus = UserStatus;
 
         const users = await User.find(filter).select('-password');
@@ -33,6 +45,9 @@ export const getUsers = async (req, res) => {
 /* OBTENER USUARIO POR ID*/
 export const getUserById = async (req, res) => {
     try {
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN'].includes(req.user.role)) {
+            return res.status(403).json({ success: false, message: 'No autorizado' });
+        }
 
         const { id } = req.params;
 
@@ -43,6 +58,10 @@ export const getUserById = async (req, res) => {
                 success: false,
                 message: 'Usuario no encontrado'
             });
+        }
+
+        if (req.user.role === 'BRANCH_ADMIN' && !['EMPLOYEE', 'CLIENT'].includes(user.role)) {
+            return res.status(403).json({ success: false, message: 'No autorizado' });
         }
 
         res.status(200).json({
@@ -63,7 +82,7 @@ export const getUserById = async (req, res) => {
 export const createUser = async (req, res) => {
     try {
 
-        const creator = req.user; 
+        const creator = req.user;
         let { role, ...data } = req.body;
 
         if (!creator) {
@@ -118,12 +137,25 @@ export const createUser = async (req, res) => {
 /* ACTUALIZAR USUARIO*/
 export const updateUser = async (req, res) => {
     try {
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN'].includes(req.user.role)) {
+            return res.status(403).json({ success: false, message: 'No autorizado' });
+        }
 
         const { id } = req.params;
         const updates = req.body;
 
         delete updates.password;
         delete updates.role;
+
+        const targetUser = await User.findById(id);
+        if (!targetUser) {
+            return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+        }
+
+        if (req.user.role === 'BRANCH_ADMIN' && !['EMPLOYEE', 'CLIENT'].includes(targetUser.role)) {
+            return res.status(403).json({ success: false, message: 'No puede editar administradores' });
+        }
+
 
         const user = await User.findByIdAndUpdate(
             id,
@@ -155,10 +187,18 @@ export const updateUser = async (req, res) => {
 /* CAMBIO DE ESTADO (SOFT DELETE)*/
 export const changeUserStatus = async (req, res) => {
     try {
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN'].includes(req.user.role)) {
+            return res.status(403).json({ success: false, message: 'No autorizado' });
+        }
 
         const { id } = req.params;
 
         const user = await User.findById(id);
+        if (!user) return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+
+        if (req.user.role === 'BRANCH_ADMIN' && !['EMPLOYEE', 'CLIENT'].includes(user.role)) {
+            return res.status(403).json({ success: false, message: 'No puede cambiar estado de administradores' });
+        }
 
         if (!user) {
             return res.status(404).json({

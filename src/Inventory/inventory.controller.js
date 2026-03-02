@@ -2,6 +2,9 @@ import Inventory from './inventory.model.js';
 
 export const saveInventory = async (req, res) => {
     try {
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN'].includes(req.user.role)) {
+            return res.status(403).send({ success: false, message: 'No autorizado' });
+        }
         const data = req.body;
         const inventory = new Inventory(data);
         await inventory.save();
@@ -13,6 +16,9 @@ export const saveInventory = async (req, res) => {
 
 export const getInventory = async (req, res) => {
     try {
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN', 'EMPLOYEE'].includes(req.user.role)) {
+            return res.status(403).send({ success: false, message: 'No autorizado' });
+        }
         const items = await Inventory.find();
         return res.send({ success: true, items });
     } catch (err) {
@@ -22,6 +28,9 @@ export const getInventory = async (req, res) => {
 // EDITAR un insumo
 export const updateInventory = async (req, res) => {
     try {
+        if (!['PLATFORM_ADMIN', 'BRANCH_ADMIN'].includes(req.user.role)) {
+            return res.status(403).send({ success: false, message: 'No autorizado' });
+        }
         const { id } = req.params; // Extraemos el ID de la URL
         const data = req.body;
         // Buscamos por ID y actualizamos con la nueva data
@@ -37,6 +46,9 @@ export const updateInventory = async (req, res) => {
 // ELIMINAR un insumo
 export const deleteInventory = async (req, res) => {
     try {
+        if (req.user.role !== 'PLATFORM_ADMIN') {
+            return res.status(403).send({ success: false, message: 'No autorizado' });
+        }
         const { id } = req.params;
         const deletedItem = await Inventory.findByIdAndDelete(id);
 
