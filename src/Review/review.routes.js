@@ -12,23 +12,59 @@ import {
 import { validateJWT } from '../../middlewares/validate-jwt.js';
 import { hasRole } from '../../middlewares/role-validator.js';
 
+import {
+    validateCreateReview,
+    validateUpdateReview,
+    validateDeleteReview
+} from '../../middlewares/review-validator.js';
+
 const router = Router();
 
-// CLIENTES
-// crear reseña
-router.post('/', validateJWT, hasRole('CLIENT'), createReview);
+/* =========================================
+   CLIENTES
+========================================= */
 
-// ver mis reseñas
-router.get('/mine', validateJWT, hasRole('CLIENT'), getMyReviews);
+// Crear reseña
+router.post(
+    '/',
+    validateJWT,
+    hasRole('CLIENT'),
+    validateCreateReview,
+    createReview
+);
 
-// actualizar reseña
-router.put('/:id', validateJWT, hasRole('CLIENT'), updateReview);
+// Ver mis reseñas
+router.get(
+    '/mine',
+    validateJWT,
+    hasRole('CLIENT'),
+    getMyReviews
+);
 
-// eliminar reseña
-router.delete('/:id', validateJWT, hasRole('CLIENT'), deleteReview);
+// Actualizar reseña
+router.put(
+    '/:id',
+    validateJWT,
+    hasRole('CLIENT'),
+    validateUpdateReview,
+    updateReview
+);
 
-// PERSONAL / ADMIN
-// ver reseñas por sucursal
+// Soft Delete (PATCH)
+router.patch(
+    '/:id/delete',
+    validateJWT,
+    hasRole('CLIENT'),
+    validateDeleteReview,
+    deleteReview
+);
+
+
+/* =========================================
+   PERSONAL / ADMIN
+========================================= */
+
+// Ver reseñas por sucursal
 router.get(
     '/branch/:branchId',
     validateJWT,

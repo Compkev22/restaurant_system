@@ -28,13 +28,20 @@ const reviewSchema = new mongoose.Schema({
         trim: true,
         default: ''
     },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
     createdAt: {
         type: Date,
         default: Date.now
     }
 });
 
-// Index único: un cliente solo puede dejar una reseña por orden
-reviewSchema.index({ customer: 1, order: 1 }, { unique: true });
+// Un cliente solo puede dejar una reseña por orden (no eliminada)
+reviewSchema.index(
+    { customer: 1, order: 1 },
+    { unique: true }
+);
 
 export default mongoose.model('Review', reviewSchema);

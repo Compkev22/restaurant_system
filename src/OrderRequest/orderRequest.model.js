@@ -26,20 +26,17 @@ const orderRequestSchema = new mongoose.Schema({
         enum: ['TAKEAWAY', 'DELIVERY'],
         required: true
     },
-
     orderStatus: {
-        type: String,
-        enum: [
-            'CREATED',
-            'CONFIRMED',
-            'PREPARING',
-            'READY',
-            'DELIVERED',
-            'CANCELLED'
-        ],
-        default: 'CREATED'
-    },
-
+            type: String,
+            enum: [
+                'Pendiente',
+                'En Preparacion',
+                'Listo',
+                'Entregado',
+                'Cancelado'
+            ],
+            default: 'Pendiente'
+        },
     deliveryAddress: {
         type: String
     },
