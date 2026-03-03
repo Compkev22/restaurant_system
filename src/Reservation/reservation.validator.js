@@ -22,10 +22,6 @@ export const reservationValidator = [
         .notEmpty()
         .isMongoId(),
 
-    body('tableId', 'La mesa es obligatoria')
-        .notEmpty()
-        .isMongoId(),
-
     body('date', 'La fecha es obligatoria')
         .notEmpty()
         .isISO8601()

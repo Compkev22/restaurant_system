@@ -4,7 +4,8 @@ import {
     getEventById,
     createEvent,
     updateEvent,
-    changeEventStatus
+    changeEventStatus,
+    toggleEventAttendance
 } from './event.controller.js';
 
 import {
@@ -15,6 +16,7 @@ import {
 } from '../../middlewares/event-validator.js';
 
 import { validateJWT } from '../../middlewares/validate-jwt.js';
+import { hasRole } from '../../middlewares/role-validator.js'
 
 const router = Router();
 
@@ -46,6 +48,12 @@ router.patch(
     validateJWT,
     validateEventStatusChange,
     changeEventStatus
+);
+
+router.patch(
+    '/:id/attendance', 
+    [validateJWT, hasRole('EMPLOYEE', 'BRANCH_ADMIN','PLATFORM_ADMIN')], 
+    toggleEventAttendance
 );
 
 export default router;

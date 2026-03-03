@@ -53,11 +53,10 @@ router.get(
     getBranchOrderRequests
 );
 // Cambiar estado del pedido
-router.put(
-    '/:id',
+router.patch(
+    '/:id/status',
     validateJWT,
     hasRole('EMPLOYEE', 'BRANCH_ADMIN','PLATFORM_ADMIN'),
-    validateUpdateOrderRequestStatus,
     updateOrderRequestStatus
 );
 

@@ -18,7 +18,7 @@ export const saveTable = async (req, res) => {
     }
 };
 
-//Todos pueden ver todas las mesasasasasasasasasa 
+//Todos pueden ver todas las mesa
 export const getTables = async (req, res) => {
     try {
         const filter = {};

@@ -32,6 +32,14 @@ const userSchema = new mongoose.Schema({
         enum: ['PLATFORM_ADMIN', 'BRANCH_ADMIN', 'EMPLOYEE', 'CLIENT'],
         default: 'CLIENT'
     },
+    branchId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Branch',
+        required: function() {
+            // Es obligatorio solo si es empleado o admin de sucursal
+            return ['BRANCH_ADMIN', 'EMPLOYEE'].includes(this.role);
+        }
+    },
     UserStatus: {
         type: String,
         enum: ['ACTIVE', 'INACTIVE'],

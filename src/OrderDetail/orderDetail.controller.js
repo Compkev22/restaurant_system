@@ -16,42 +16,35 @@ export const createOrderDetail = async (req, res) => {
 
         const existingOrder = await Order.findById(order);
         if (!existingOrder) {
-            return res.status(404).json({
-                success: false,
-                message: 'Orden no encontrada'
-            });
+            return res.status(404).json({ success: false, message: 'Orden no encontrada' });
         }
 
         let precio;
 
         if (productoId) {
-            const product = await Product.findById(productoId);
+            const product = await Product.findById(productoId).populate('ingredientes.inventoryId');
             if (!product) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Producto no encontrado'
-                });
+                return res.status(404).json({ success: false, message: 'Producto no encontrado' });
             }
             precio = product.precio;
 
             for (const ingrediente of product.ingredientes) {
-                const inventaryItem = ingrediente.inventoryId;
+                const inventoryItem = ingrediente.inventoryId; 
                 const cantidadNecesaria = ingrediente.cantidadUsada * cantidad;
 
-                if (inventaryItem.stock < cantidadNecesaria) {
+                if (!inventoryItem || inventoryItem.stock < cantidadNecesaria) {
                     return res.status(400).json({
                         success: false,
-                        message: 'No hay suficiente stock para crear el producto'
+                        message: `Stock insuficiente para: ${inventoryItem ? inventoryItem.name : 'Insumo desconocido'}. Requerido: ${cantidadNecesaria}, Disponible: ${inventoryItem ? inventoryItem.stock : 0}`
                     });
                 }
-
             }
 
             for (const ingrediente of product.ingredientes) {
                 const cantidadNecesaria = ingrediente.cantidadUsada * cantidad;
 
                 await Inventory.findByIdAndUpdate(
-                    ingrediente.inventoryId,
+                    ingrediente.inventoryId._id,
                     { $inc: { stock: -cantidadNecesaria } }
                 );
             }
@@ -60,10 +53,7 @@ export const createOrderDetail = async (req, res) => {
         if (comboId) {
             const combo = await Combo.findById(comboId);
             if (!combo) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Combo no encontrado'
-                });
+                return res.status(404).json({ success: false, message: 'Combo no encontrado' });
             }
             precio = combo.ComboPrice;
         }
@@ -85,16 +75,12 @@ export const createOrderDetail = async (req, res) => {
 
         res.status(201).json({
             success: true,
-            message: 'Item creado correctamente',
+            message: 'Item creado y stock descontado',
             data: detail
         });
 
     } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: 'Error al crear item',
-            error: error.message
-        });
+        res.status(400).json({ success: false, message: 'Error al crear item', error: error.message });
     }
 };
 

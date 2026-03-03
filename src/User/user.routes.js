@@ -20,6 +20,7 @@ import { validateJWT } from '../../middlewares/validate-jwt.js';
 const router = Router();
 
 router.get('/', validateJWT, getUsers);
+router.get('/profile', validateJWT, getProfile);
 router.get('/:id',validateJWT, validateGetUserById, getUserById);
 
 router.post(
@@ -29,7 +30,6 @@ router.post(
     createUser
 );
 
-router.get('/profile', getProfile);
 
 router.put(
     '/:id',
