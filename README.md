@@ -324,7 +324,7 @@ Este proyecto está bajo la Licencia MIT. Consulta el archivo [LICENSE](LICENSE)
 ## 📞 Contacto
 
 Para preguntas o soporte:
-- Email: contacto@restaurante.com
+- Email: systemrestaurantlfc02@gmail.com
 - Issues: [GitHub Issues](https://github.com/Compkev22/restaurant_system/issues)
 
 ---
